@@ -1,5 +1,5 @@
-# PIpeline-TumorSec
-#Manual de Procedimientos: Paquete Bioinformático TumorSec.
+# Pipeline-TumorSec
+## Manual de Procedimientos: Paquete Bioinformático TumorSec.
 
 A continuación se presenta el manual de usuario de pipeline bioinformático TumorSec. Desarrollado por el laboratorio de Genómica del Cáncer en colaboración con GENOMED, ambos de la facultad de medicina, Universidad de Chile.
 
