@@ -57,6 +57,8 @@ El laboratorio de bioinformática GenoMed cuenta con una unidad de cinta HP LTO-
 
 De manera global el programa TumorSec corresponde a un pipeline escrito en bash optimizado para datos NGS de alto rendimiento para librerías paired-end, enfocado en la búsqueda de variantes somáticas con importancia clínica para tejidos tumorales sin la necesidad de una muestra de sangre para el descarte de variantes germinales. Debido a estos grandes desafíos, el flujo de trabajo de TumorSec se rige por protocolos establecidos para la búsquedas de variantes, replicando las mejores prácticas de GATK en el pre-procesamiento de datos. Consta con un riguroso informe de calidad automatizado, que permite obtener métricas de los puntos críticos del pipeline, para finalizar con la anotación funcional y posteriores filtros que permite tener variantes de calidad con diversa información funcional para la toma de decisiones. El resumen de los procesos del flujo de trabajo de TumorSec se pueden ver a continuación.
 
+![Captura de pantalla 2020-01-20 a la(s) 14 02 56](https://user-images.githubusercontent.com/37847170/72745089-b0bfaa80-3b8d-11ea-9269-b9a223d66387.png)
+
 **Figura 1: Diagrama del flujo de trabajo del pipeline bioinformático de TumorSec.**
 Procesamiento de datos realizado en el flujo de trabajo bioinformático, desde los archivos BCL hasta generar el archivo VCF con la lista de variantes somáticas por muestra. El detalle de los procesos y subprocesos se describen a continuación.
 
