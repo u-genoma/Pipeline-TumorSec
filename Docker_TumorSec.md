@@ -12,6 +12,42 @@
 | Fpdf - 1.7.2 |
 | numpy - 1.18.1 | 
 | argparse - 1.4.0 | 
+| pandas - 0.25.3 |
+| matplotlib - 3.1.2 |
+| request - 2.22.0 |
+| csv |
+|gzip |
+| pylab |
+| time |
+
+|librerias de R |
+|----------|
+| writexl |
+| maftools |
+| gtools |
+| dplyr |
+| tidyr |
+| stringr |
+| ggplot2 |
+| reshape2 |
+| gridExtra |
+| grid |
+| vcfR |
+
+| programas |
+|----------|
+| bcl2fastq - 2.20.0 |
+| bwa - 0.7.12 |
+| samtools - 1.3.1 |
+| bedtools - 2.26.0 |
+| mosdepth - 0.2.5 |
+| qualimap - 2.2.2a |
+| Somacticseq |
+| GATK |
+| picard |
+| ANNOVAR |
+| java |
+
 
 
 ```
