@@ -13,7 +13,7 @@
 ```
 
 
-### librerias y programas instalados en a imagen de Docker 
+### librerias y programas instalados en imagen Docker 
 
 | librerias de python  |  
 |----------|
