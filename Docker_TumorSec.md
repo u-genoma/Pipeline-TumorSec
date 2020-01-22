@@ -7,11 +7,13 @@
 
 
 
-
+### Directorio de trabajo
 ```
 /home/egonzalez/workSpace/Docker_centos
 ```
 
+
+### librerias y programas instalados en a imagen de Docker 
 
 | librerias de python  |  
 |----------|
@@ -55,7 +57,9 @@
 | java |
 
 
+### Ejecución del docker 
 
+#### Mediante archivo preconfigurado en bash
 ```
 #!/bin/bash
 
@@ -74,6 +78,8 @@ echo -e "Done at `date +"%Y/%m/%d %H:%M:%S"`" 1>&2
 
 ```
 
+#### Modo interactivo 
+
 ```
 docker run -ti --rm -v /:/mnt/ egonzalez/tumorsec_centos:0.1 sh 01.Run_TumorSec.sh
 ```
@@ -84,7 +90,7 @@ docker run -ti --rm -v /:/mnt/ egonzalez/tumorsec_centos:0.1 sh 01.Run_TumorSec.
 ![Captura de Pantalla 2020-01-21 a la(s) 23 16 49](https://user-images.githubusercontent.com/37847170/72859987-451c3100-3ca4-11ea-9768-bf0d712d1672.png)
 
 
-
+## TumorSec Dockerfile
 
 ```
 FROM centos:7
