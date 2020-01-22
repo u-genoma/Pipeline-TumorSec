@@ -15,14 +15,14 @@
 
 | librerias de python  |  
 |----------|
-| Fpdf - 1.7.2 |
-| numpy - 1.18.1 | 
-| argparse - 1.4.0 | 
-| pandas - 0.25.3 |
-| matplotlib - 3.1.2 |
-| request - 2.22.0 |
+| Fpdf |
+| numpy | 
+| argparse | 
+| pandas|
+| matplotlib |
+| request|
 | csv |
-|gzip |
+| gzip |
 | pylab |
 | time |
 
@@ -49,8 +49,8 @@
 | mosdepth - 0.2.5 |
 | qualimap - 2.2.2a |
 | Somacticseq |
-| GATK |
-| picard |
+| GATK - 3.8|
+| picard - 2.20.2|
 | ANNOVAR |
 | java |
 
