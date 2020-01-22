@@ -1,4 +1,49 @@
 
+## Imagen de Docker: pipeline TumorSec.
+
+
+```
+/home/egonzalez/workSpace/Docker_centos
+```
+
+
+| Tables   |      Are      |  Cool |
+|----------|:-------------:|------:|
+| col 1 is |  left-aligned | $1600 |
+| col 2 is |    centered   |   $12 |
+| col 3 is | right-aligned |    $1 |
+
+
+```
+#!/bin/bash
+
+set -e
+
+echo -e "Start at `date +"%Y/%m/%d %H:%M:%S"`" 1>&2
+
+docker run --rm -v /:/mnt egonzalez/tumorsec_centos:0.1 \
+sh /programs/01.Run_TumorSec.sh --input--dir /mnt//home/egonzalez/workSpace/runs_TumorSec/200109_TumorSec \
+--threads 20 \
+--baseSpace /mnt//home/egonzalez/BaseSpace/Runs/Tumorsec20200109 \
+--dendogram y \
+--input--data /mnt//home/egonzalez/workSpace/PipelineTumorSec/00.inputs_TumorSec.ini
+
+echo -e "Done at `date +"%Y/%m/%d %H:%M:%S"`" 1>&2
+
+```
+
+
+
+```
+ docker run -ti --rm -v /:/mnt/ egonzalez/tumorsec_centos:0.1 /bin/bash
+```
+
+
+
+
+
+
+
 
 ```
 FROM centos:7
