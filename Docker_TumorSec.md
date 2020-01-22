@@ -74,15 +74,15 @@ echo -e "Done at `date +"%Y/%m/%d %H:%M:%S"`" 1>&2
 
 ```
 
-
-
 ```
- docker run -ti --rm -v /:/mnt/ egonzalez/tumorsec_centos:0.1 /bin/bash
+docker run -ti --rm -v /:/mnt/ egonzalez/tumorsec_centos:0.1 sh 01.Run_TumorSec.sh
 ```
 
+![Captura de Pantalla 2020-01-21 a la(s) 23 02 47](https://user-images.githubusercontent.com/37847170/72859369-56643e00-3ca2-11ea-8059-97eaf8342944.png)
 
 
 
+![Captura de Pantalla 2020-01-21 a la(s) 23 03 06](https://user-images.githubusercontent.com/37847170/72859363-5106f380-3ca2-11ea-8dad-45fa6c2ed506.png)
 
 
 
