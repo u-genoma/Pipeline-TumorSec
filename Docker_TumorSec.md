@@ -2,6 +2,12 @@
 ## Imagen de Docker: pipeline TumorSec.
 
 
+
+![Captura de Pantalla 2020-01-21 a la(s) 22 32 14](https://user-images.githubusercontent.com/37847170/72857961-f9668900-3c9d-11ea-9648-64b16cd3c3ce.png)
+
+
+
+
 ```
 /home/egonzalez/workSpace/Docker_centos
 ```
