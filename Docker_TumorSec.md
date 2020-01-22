@@ -7,11 +7,11 @@
 ```
 
 
-| Tables   |      Are      |  Cool |
-|----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
+| librerias de python  |  
+|----------|
+| Fpdf - 1.7.2 |
+| numpy - 1.18.1 | 
+| argparse - 1.4.0 | 
 
 
 ```
