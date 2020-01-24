@@ -18,7 +18,8 @@ Lista de Bases de datos utilizadas:
 - AMR.sites.2015_08
 - EAS.sites.2015_0
 - EUR.sites.2015_08
-- SAS.sites.2015_08,exac03
+- SAS.sites.2015_08
+- exac03
 - dbnsfp35c
 - cadd13
 - avsnp150
