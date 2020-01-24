@@ -36,5 +36,10 @@ Comandos para la descarga.
 ### 3. Montar datos de BaseSpace en Docker
 ### 4. Configurar archivo con parametros de entrada
 ### 5. Ejecucion del Pipeline
+
+```docker run --privileged -ti --rm -v /:/mnt labgenomicatumorsec/tumorsec:0.1 /bin/bash```
+
+```sh 01.Run_TumorSec.sh```
+
 ### 6. Archivos de salida e interpretación de resultados
 
