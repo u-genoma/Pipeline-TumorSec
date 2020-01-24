@@ -13,16 +13,16 @@ Una vez descargadas las bases de datos y la imagen docker, se debe ejecutar la i
 #### 1.2 Descargar bases de datos
 
 Lista de Bases de datos utilizadas: 
-- refGene.
-- AFR.sites.2015_08.
-- AMR.sites.2015_08.
-- EAS.sites.2015_0.
-- EUR.sites.2015_08.
-- SAS.sites.2015_08,exac03.
-- dbnsfp35c.
-- cadd13.
-- avsnp150.
-- cosmic70.
+- refGene
+- AFR.sites.2015_08
+- AMR.sites.2015_08
+- EAS.sites.2015_0
+- EUR.sites.2015_08
+- SAS.sites.2015_08,exac03
+- dbnsfp35c
+- cadd13
+- avsnp150
+- cosmic70
 - clinvar_20180603
 
 Comandos para la descarga. 
