@@ -11,24 +11,24 @@
 # EXAMPLE: Comando: sh 01.Run_TumorSec.sh --input--dir ${INDIR} --threads ${THREAD} --baseSpace ${BASESPACE} --dendogram ${DENDOGRAM} --step ${STEP} --input--data ${INPUT_DATA}
 ############################
 
-
-#### LOAD INPUT DATA 
+#### LOAD INPUT DATA
 PIPELINE_TUMORSEC="/home/egonzalez/workSpace/PipelineTumorSec"
-
 ### SI OCURRE ALGUN ERROR DENTRO EL PIPELINE, ESTE SE DETIENE.
+
 abort()
 {
-    echo >&2 '
+    echo >&3 '
 ***************
 *** ABORTED ***
 ***************
 '
-    echo "An error occurred. Exiting..." >&2
+    echo "An error occurred. Exiting..." >&3
     exit 1
 }
 trap 'abort' 0
 #abort on error
 set -e
+#set -o errexit
 
 ### PARAMETROS DE ENTRADAS A TRAVES DE LINEA DE COMANDOS
 PARAMS=""
@@ -64,7 +64,7 @@ while (( "$#" )); do
       break
       ;;
     -*|--*=) # unsupported flags
-      echo "Error: Unsupported flag $1" >&2
+      echo "Error: Unsupported flag $1" >&3
       exit 1
       ;;
     *) # preserve positional arguments
@@ -78,84 +78,173 @@ eval set -- "$PARAMS"
 
 if [ -z "$INDIR" ]; then
 	echo ""
-	echo "¿Cual es el directorio de salida (donde se almacenaran los resultados)?"
+	echo "Enter the output directory:"
 	read INDIR
 fi
 
 if [ -z "$BASESPACE" ]; then
 	echo ""
-	echo "¿Cual es el directorio de la corrida en BaseSpace?"
+	echo "Enter the BaseSpace directory:"
 	read BASESPACE
 fi
 
 if [ -z "$STEP" ]; then
 	echo ""
-	echo "Desde que paso se correrá pipeline de TumorSec:"
-	echo "0. Todo el pipeline (desde desmultilpexar datos)"
-	echo "1. Desde trimming"
-	echo "2. Mapeo de reads al genoma"
-	echo "3. Eliminar duplicados"
-	echo "4. Realineamiento de indels"
-	echo "5. Recalibración de bases"
-	echo "6. Llamado de variantes"
-	echo "7. Anotación"
-	echo "Ingresar número (0-7):"
+	echo "What steps do you want to execute?"
+	echo "0. Demultiplexing"
+	echo "1. Trimming"
+	echo "2. Mapping"
+	echo "3. Remove duplicates - QC report"
+	echo "4. Realign of indels"
+	echo "5. Recalibration" 
+	echo "6. Varcall - Variants report"
+	echo "7. Annotation"
+	echo "8. Filter vcf (RGO Input)"
+	echo "Example, all pipeline -> 0-8, only varcall -> 6, from trimming to realignment -> 1-4"
 	read STEP
 fi
 
 if [ -z "$DENDOGRAM" ]; then	
 	echo ""
-	echo "Desea construir dendograma de las muestras(y/n)"
+	echo "Build sample dendogram (y / n)"
 	read DENDOGRAM
 fi
 
 if [ -z "$THREAD" ]; then
 	echo ""
-	echo "Ingrese número de procesadores:"
+	echo "Threads:"
 	read THREAD
 fi
 
 if [ -z "$INPUT_DATA" ]; then
 	echo ""
-	echo "Ingresar parámetros de entrada (path) o dejar por defecto (0):"
+	echo "Enter input parameters (path) or by default (0):"
 	read INPUT_DATA
 fi
 
 #### CARGAR VARIABLES Y DATOS DE ENTRADA 
 if [ "$INPUT_DATA" -eq 0 ]; then
+
     INPUT_DATA="${PIPELINE_TUMORSEC}/00.inputs_TumorSec.ini"
 	source $INPUT_DATA
 else 
 	source $INPUT_DATA
 fi
 
+## agregar log por paso. (funcion), cambiar entrada de pasos. agregar comandos al log. poner tiempo por paso ejecutado.
 echo ""
 echo "############################################"
-echo "     Bienvenido al pipeline de TumorSec      "
+echo "     Welcome to the TumorSec pipeline      "
 echo "############################################"
 echo ""
-echo "== Búsqueda de variantes somáticas de importancia oncológica =="
-echo "Desarrollado por el Laboratorio de Genómica del Cáncer y GENOMEDLAB, Facultad de medicina. Universidad de Chile"
+echo "== Search for somatic variants of oncological importance =="
+echo "Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile"
 echo ""
 echo "Comando: sh ${PIPELINE_TUMORSEC}/01.Run_TumorSec.sh --input--dir ${INDIR} --threads ${THREAD} --baseSpace ${BASESPACE} --dendogram ${DENDOGRAM} --step ${STEP} --input--data ${INPUT_DATA}" 
 echo ""   	
 
 #set -xv
 #trap read debug  
+
+#### función de creación de log por cada paso del pipeline
+#0 - stdin
+#1 - stdout
+#2 - stderr
+
+exec 3>&1 4>&2
+
+### funcion que revise que esta todo bien antes de correr el siguiente paso.
+# en caso que no sea asi¡, debe enviar un mensaje de error.
+
+step(){
+
+	STEP=$1
+ 	START=$(echo $STEP | awk -F "-" '{print $1}')
+	END=$(echo $STEP | awk -F "-" '{print $2}')
+
+	if [ -z "$END" ]; then
+		END=$START
+	fi
 	
+	if (( $START > $END )); then
+		echo "Error: The ${START} must by less than ${END} in step parameter ${STEP}" >&3
+		exit
+	fi
+}
+
+start_log(){
+	n_step=$1
+	string_step=$2
+	
+	if [ ! -d "${INDIR}/${LOG}" ]; then 
+		mkdir "${INDIR}/${LOG}"
+	fi
+	
+	log_output="${INDIR}/${LOG}/${n_step}_log_${string_step}.out"
+	echo "$(date) : step ${n_step} - start - ${string_step}" >&3
+	echo "$(date) : step ${n_step} - logfile - ${log_output}" >&3
+	exec 1>$log_output 2>&1
+}
+
+end_log(){
+	n_step=$1
+	string_step=$2
+	echo "$(date) : step ${n_step} - finished - ${string_step}" >&3
+	echo "##############"
+	echo "DONE-TumorSec"
+	echo "##############"
+}
+
+check_log(){
+
+	n_step=$1
+	string_step=$2
+	log_output="${INDIR}/${LOG}/${n_step}_log_${string_step}.out"
+
+	## Si existe el archivo, se debe buscar el string "DONE-TuumorSec" en el log
+	if [ ! -f "${log_output}" ]; then
+           echo "Error: file ${log_output} not found"
+           exit
+    fi
+	check=$(grep "DONE-TumorSec" $log_output | wc -l)
+	
+	if (($check == 0)); then
+		echo "Error: Step ${n_step} ${string_step} with error, it don't finished." >&3
+		echo "Error: Check log:${log_output}"
+		exit
+	fi 
+	 
+}
+
+get_samples(){
+	cd "${INDIR}/${FASTQ}"
+	echo $PWD
+	#GET SAMPLES ID FROM FASTQ FILES
+	SAMPLES=$(ls *R1_*.fastq.gz| awk '{split($0,array,"_")} {print array[1]"_"array[2]}')
+}
+
+step $STEP
+
 ####################################
 #                                  #
 #   DEMULTIPLEXING (BCL2FASTQ)     #
 ####################################
 
-if [ $STEP -le 0 ]; then
+
+if (( $START == 0 )); then
+
+start_log 0 "demultiplexing"
 
 	if [ ! -d "${INDIR}/${FASTQ}" ]; then 
 		mkdir "${INDIR}/${FASTQ}"
 	else 
 		echo "The ${INDIR}/${FASTQ} directory alredy exists"
     fi
-    #bcl2fastq -R "${BASESPACE}/Files" -o $INDIR/$FASTQ
+    
+    bcl2fastq -R "${BASESPACE}/Files" -o $INDIR/$FASTQ  
+      
+end_log 0 "demultiplexing"
+
 fi
 
 #################################
@@ -163,20 +252,21 @@ fi
 #   TRIMMING OF DATA (FASTP)    #
 #################################
 
-if [ $STEP -le 1 ]; then
+
+if (( $START <= 1 )) && (( $END >= 1 )); then 
+
+check_log 0 "demultiplexing"
+start_log 1 "trimming"
+get_samples
 
 	if [ ! -d "${INDIR}/${TRIM}" ]; then
    		mkdir "${INDIR}/${TRIM}"
 	else 
 		echo "The ${INDIR}/${TRIM} directory alredy exists"
    	fi
-
-	cd "${INDIR}/${FASTQ}"
-	echo $PWD
-	#GET SAMPLES ID FROM FASTQ FILES
-	SAMPLES=$(ls *R1_*.fastq.gz| awk '{split($0,array,"_")} {print array[1]"_"array[2]}')
-fi
-<<HOLA
+   	
+   	start_log 1 "trimming"
+	get_samples
 	
 	for sample in $SAMPLES
 	do
@@ -199,9 +289,11 @@ fi
 		-O $trimmed_R2 \
 		-j $output_json > $output_log" >> "${INDIR}/comands_fastp.txt"
 	done
-	#run fastp in parallel for all samples
+	#run fastp in parallel for all samples	
 	cat "${INDIR}/comands_fastp.txt"| parallel -j $THREAD
 	rm "${INDIR}/comands_fastp.txt"
+	
+end_log 1 "trimming"
 
 fi
 
@@ -210,14 +302,19 @@ fi
 #    MAPPING OF READS (BWA)     #
 #################################
 
-if [ $STEP -le 2 ]; then
+
+if (( $START <= 2 )) && (( $END >= 2 )); then
+
+check_log 1 "trimming"
+start_log 2 "mapping"
+get_samples
 
 	if [ ! -d "${INDIR}/${MAPPING}" ]; then
                 mkdir "${INDIR}/${MAPPING}"
         else
                 echo "The ${INDIR}/${MAPPING} directory alredy exists"
-        fi
-
+    fi
+	get_samples
 	for sample in $SAMPLES
 	do	
 		echo "Running bwa for $sample"
@@ -249,20 +346,29 @@ if [ $STEP -le 2 ]; then
 		#don't work in parallel
 		samtools index $sorted_bam
 	done
+
+end_log 2 "mapping"
+
 fi
+
 #################################
 #                               #
 #  DELETE DUPLICATES (PICARD)   #
 #################################
 
-if [ $STEP -le 3 ]; then
+
+if (( $START <= 3 )) && (( $END >= 3 )); then
+
+check_log 2 "mapping"
+start_log 3 "remove-Duplicates"
+get_samples
 
 	if [ ! -d "${INDIR}/${DEDUP}" ]; then
                 mkdir "${INDIR}/${DEDUP}"
         else
                 echo "The ${INDIR}/${DEDUP} directory alredy exists"
         fi
- 
+    get_samples
 	for sample in $SAMPLES
 	do      
 		echo "Running PICARD MarkDuplicates for $sample"
@@ -284,30 +390,45 @@ if [ $STEP -le 3 ]; then
 		rm "${INDIR}/${MAPPING}/${sample}.sorted.bam"
 		
 	 done
+	 
+end_log 3 "remove-Duplicates"
 
+fi
 	 
 #################################
 #                               #
 #         QC REPORT             #
 #################################
 
-sh "${PIPELINE_TUMORSEC}/02.QC_Reports.sh --input--dir ${INDIR} -e ${INPUT_DATA} -b ${BASESPACE}" &
+if (( $START <= 3 )) && (( $END >= 3 )); then
+
+start_log "QC-Report-1" "quality-metrics"
+
+	### agregar log.
+	sh "${PIPELINE_TUMORSEC}/02.QC_Reports.sh --input--dir ${INDIR} -e ${INPUT_DATA} -b ${BASESPACE}" &
+	
+#end_log "QC-Report-1" "quality-metrics"
 
 fi
-
 #################################
 #                               #
 #     REALIGN INDELS (GATK)     #
 ################################# 
     
-if [ $STEP -le 4 ]; then
-    
+
+if (( $START <= 4 )) && (( $END >= 4 )); then
+
+check_log 3 "remove-Duplicates"
+start_log 4 "realign-indels"
+get_samples
+
 	if [ ! -d "${INDIR}/${REALIGN}" ]; then
                 mkdir "${INDIR}/${REALIGN}"
         else
                 echo "the ${INDIR}/${REALIGN} directory alredy exists"
         fi
-
+        
+	get_samples
 	for sample in $SAMPLES
 	do 
 		echo "Running GATK RealignerTargetCreator for $sample"
@@ -345,6 +466,9 @@ if [ $STEP -le 4 ]; then
 
 	cat "${INDIR}/comands_GATK_IndelRealigner.txt"| parallel -j $THREAD
 	rm "${INDIR}/comands_GATK_IndelRealigner.txt"
+	
+end_log 4 "realign-indels"
+
 fi
 
 ####################################
@@ -352,14 +476,19 @@ fi
 #  RECALIBRATION OF BASES (GATK)   #
 #################################### 
 
-if [ $STEP -le 5 ]; then
+
+if (( $START <= 5 )) && (( $END >= 5 )); then
+
+check_log 4 "realign-indels"
+start_log 5 "recalibration"
+get_samples
 
 	if [ ! -d "${INDIR}/${BQSR}" ]; then
                 mkdir "${INDIR}/${BQSR}"
         else
                 echo "The ${INDIR}/${BQSR} directory alredy exists"
         fi
-
+        
         for sample in $SAMPLES
         do
               realign_resorted_bam="${INDIR}/${REALIGN}/${sample}.resorted.bam" 
@@ -402,15 +531,29 @@ if [ $STEP -le 5 ]; then
          cat "${INDIR}/comands_GATK_PrintReads.txt" | parallel -j $THREAD
          sh "${INDIR}/comands_GATK_PrintReads.txt"
          rm "${INDIR}/comands_GATK_PrintReads.txt"
+
+end_log 5 "recalibration"
+
 fi
-        
+
 ####################################
 #                                  #
 #     DENDOGRAM PIPELINE           #
-####################################         
-#if [[ $DENDOGRAM == "y" ]]; then
-	### MAKE LIST OF BAMS
-	if [ ! -d "${INDIR}/${DEM_DIR}" ]; then
+####################################
+
+if [[ $DENDOGRAM == "y" ]]; then
+
+check_log 5 "recalibration"	
+start_log "QC-Report-2" "dendogram"
+get_samples
+
+	if [ ! -d "${INDIR}/${METRICS}" ]; then
+            mkdir "${INDIR}/${METRICS}"
+    else
+            echo "The ${INDIR}/${METRICS} directory alredy exists"
+    fi
+    
+    if [ ! -d "${INDIR}/${DEM_DIR}" ]; then
             mkdir "${INDIR}/${DEM_DIR}"
     else
             echo "The ${INDIR}/${DEM_DIR} directory alredy exists"
@@ -420,24 +563,31 @@ fi
 	
 	cd "${INDIR}/${BQSR}"
 	echo $PWD
-	sh -c "ls *resorted.bam" > $LIST_BAM_FILE
+	sh -c "ls ${PWD}/*resorted.bam" > $LIST_BAM_FILE
 	
 	### RUN DENDOGRAM
-	#sh ${PIPELINE_TUMORSEC}/04.QC_dendogram.sh -l $LIST_BAM_FILE -o $INDIR/$DEM_DIR -dp $DP -maf $MAF -gm $PCT_GT_SAMPLES -gs $PCT_GT_SNV -e $INPUT_DATA &
+	sh ${PIPELINE_TUMORSEC}/04.QC_dendogram.sh -l $LIST_BAM_FILE -o $INDIR/$DEM_DIR -dp $DP -maf $MAF -gm $PCT_GT_SAMPLES -gs $PCT_GT_SNV -e $INPUT_DATA &
 	echo "sh ${PIPELINE_TUMORSEC}/04.QC_dendogram.sh -l $LIST_BAM_FILE -o $INDIR/$DEM_DIR -dp $DP -maf $MAF -gm $PCT_GT_SAMPLES -gs $PCT_GT_SNV -e $INPUT_DATA"
 
-HOLA
+fi
 ####################################
 #                                  #
 #        VARCALL (SOMATICSEQ)      #
 ####################################
 
 
+if (( $START <= 6 )) && (( $END >= 6 )); then
+
+check_log 5 "recalibration"
+start_log 6 "varcall"
+get_samples
+	
 	if [ ! -d "${INDIR}/${VARCALL}" ]; then
             mkdir "${INDIR}/${VARCALL}"
         else
             echo "the ${INDIR}/${VARCALL} directory alredy exists"
     fi
+
         for sample in $SAMPLES
         do 
         	echo $sample
@@ -477,28 +627,44 @@ HOLA
 	rm "${INDIR}/comands_somaticseq_part1.txt"
 	rm "${INDIR}/comands_somaticseq_part2.txt"
 
+end_log 6 "varcall"
+
+fi
+
+
 #####################################
 #                                   #
 #   FUNTIONAL ANNOTATION (ANNOVAR)  #
 #####################################
 
-	
+if (( $START <= 7 )) && (( $END >= 7 )); then
+
+check_log 6 "varcall"
+start_log 7 "annotation"
+get_samples
+
 	if [ ! -d "${INDIR}/${ANNOTATE}" ]; then
                 mkdir "${INDIR}/${ANNOTATE}"
         else
                 echo "the ${INDIR}/${ANNOTATE} directory alredy exists"
         fi	
-      
-        cd "${INDIR}/${ANNOTATE}"
+        
+    if [ ! -d "${INDIR}/${ANNOVAR_ANOT}" ]; then
+                mkdir "${INDIR}/${ANNOVAR_ANOT}"
+        else
+                echo "the ${INDIR}/${ANNOVAR_ANOT} directory alredy exists"
+        fi
+        
+        cd "${INDIR}/${ANNOVAR_ANOT}"
 	
 	for sample in $SAMPLES
 	do 
 	   	consensus_sSNV="${INDIR}/${VARCALL}/${sample}/SomaticSeq/Consensus.sSNV.vcf"
-	   	consensus_sSNV_PASS="${INDIR}/${ANNOTATE}/${sample}_sSNV.PASS.vcf"
-	   	output_annovar="${INDIR}/${ANNOTATE}/${sample}.annovar"
+	   	consensus_sSNV_PASS="${INDIR}/${ANNOVAR_ANOT}/${sample}_sSNV.PASS.vcf"
+	   	output_annovar="${INDIR}/${ANNOVAR_ANOT}/${sample}.annovar"
         consensus_sINDEL="${INDIR}/${VARCALL}/${sample}/SomaticSeq/Consensus.sINDEL.vcf"
-	   	consensus_sINDEL_PASS="${INDIR}/${ANNOTATE}/${sample}_sINDEL.PASS.vcf"
-        consensus_sINDEL_sSNV_PASS="${INDIR}/${ANNOTATE}/${sample}.Consensus.sINDEL.sSNV_PASS.vcf"
+	   	consensus_sINDEL_PASS="${INDIR}/${ANNOVAR_ANOT}/${sample}_sINDEL.PASS.vcf"
+        consensus_sINDEL_sSNV_PASS="${INDIR}/${ANNOVAR_ANOT}/${sample}.Consensus.sINDEL.sSNV_PASS.vcf"
 
 	   	 egrep "(NUM_TOOLS=(2|3|4|5|6))|(^#)" $consensus_sSNV > $consensus_sSNV_PASS &
          egrep "(NUM_TOOLS=(2|3|4|5|6))|(^#)" $consensus_sINDEL > $consensus_sINDEL_PASS
@@ -510,6 +676,11 @@ HOLA
            	--variant $consensus_sINDEL_PASS \
            	-o $consensus_sINDEL_sSNV_PASS --assumeIdenticalSamples
            
+        rm $consensus_sSNV_PASS
+        rm $consensus_sSNV_PASS.idx
+        rm $consensus_sINDEL_PASS
+        rm $consensus_sINDEL_PASS.idx
+        
 	   	#RUN ANNOVAR BY SAMLE.
 	   	perl $SCRIPT_ANNOVAR $consensus_sINDEL_sSNV_PASS $ANNOVAR_HDB \
 		-buildver hg19 \
@@ -520,17 +691,21 @@ HOLA
 
 	done
 
+fi
+
 #####################################
 #                                   #
 #        CANONICAL TRANSCRIPT       #
 #####################################
+
+if (( $START <= 7 )) && (( $END >= 7 )); then
 
 	 if [ ! -d "${INDIR}/${CANONICAL}" ]; then
                 mkdir "${INDIR}/${CANONICAL}"
         else
                 echo "the ${INDIR}/${CANONICAL} directory alredy exists"
         fi
-     
+
      for sample in $SAMPLES
      do
 	 INPUT="${INDIR}/${ANNOTATE}/${sample}.knownGene.annovar.hg19_multianno.txt "
@@ -538,10 +713,15 @@ HOLA
 	 #python $CANONICAL_TRANSCRIP -a $INPUT -o $OUTPUT -k $LIST_CANONICAL
      done
 
+fi
+
 #####################################
 #                                   #
 #           ANNOTATION (CGI)        #
 #####################################
+
+
+if (( $START <= 7 )) && (( $END >= 7 )); then
 
 	if [ ! -d "${INDIR}/${CGI}" ]; then
                 mkdir "${INDIR}/${CGI}"
@@ -550,7 +730,7 @@ HOLA
         fi	
 
         cd "${INDIR}/${CGI}"
-	
+        
 	for sample in $SAMPLES
 	do
 	
@@ -561,7 +741,7 @@ HOLA
             echo "the ${INDIR}/${CGI}/${sample} directory alredy exists"
         fi	
         	
-		VCF="${INDIR}/${ANNOTATE}/${sample}.Consensus.sINDEL.sSNV_PASS.vcf"
+		VCF="${INDIR}/${ANNOVAR_ANOT}/${sample}.Consensus.sINDEL.sSNV_PASS.vcf"
 		OUTPUT="${INDIR}/${CGI}/${sample}/${sample}.zip"
 		CGI_remane="${INDIR}/${CGI}/${sample}/mutation_analysis_rename.tsv"
 		CGI_MA="${INDIR}/${CGI}/${sample}/mutation_analysis.tsv"
@@ -574,8 +754,8 @@ HOLA
 		sed "s/default_id/${sample}/g" $CGI_MA > $CGI_remane
 		echo $CGI_remane >> $CGI_OUTPUT		
 	done
-	
-	    Rscript $CGI_MAF_ONCOPLOT $CGI_OUTPUT "${INDIR}/${CGI}/" $AF $ExAC $DP_ALT
+
+	   ### REVISAR, ESTE NO VA AQUI
 
 #################################
 #                               #
@@ -584,30 +764,49 @@ HOLA
 
 sh $PIPELINE_TUMORSEC/03.Variants_reports.sh --input--dir $INDIR --input--data $INPUT_DATA &
 
+end_log 7 "annotation"
 
-        for sample in $SAMPLES
-        do 
-        	echo $sample
-			output_dir_varcall="${INDIR}/${VARCALL}/${sample}"
-			bqsr_resorted_bam="${INDIR}/${BQSR}/${sample}.resorted.bam"
-			#mkdir $output_dir_varcall
- 		
-			$SOMATICSEQ  --in-bam $bqsr_resorted_bam \
-			--human-reference $hg19_fa \
-			--output-dir $output_dir_varcall \
-			--dbsnp $dbsnp_138hg19_vcf \
-			--selector $HG19_OncoChile_bed \
-			--cosmic $cosmic_vcf \
-			--min-vaf 0.01 \
-			--action echo --mutect2 --varscan2 --vardict --lofreq --somaticseq \
-		
-		done 
+############################
+#                          #
+#         VCF RGO          #
+############################
 
+if (( $START <= 8 )) && (( $END >= 8 )); then
+check_log 6 "varcall"
+start_log 8 "filter-vcf-RGO"
+get_samples
+
+	if [ ! -d "${INDIR}/${RGO}" ]; then
+                mkdir "${INDIR}/${RGO}"
+        else
+                echo "the ${INDIR}/${RGO} directory alredy exists"
+        fi	
+
+	for sample in $SAMPLES
+	do
 	
+	consensus_sINDEL_sSNV_PASS="${INDIR}/${ANNOVAR_ANOT}/${sample}.Consensus.sINDEL.sSNV_PASS.vcf"
+	vcf_filter="${INDIR}/${RGO}/${sample}_AF-${AF}-DPALT-${DP}.vcf"
+	
+	vcffilter -f "VAF > 0.05" $consensus_sINDEL_sSNV_PASS > $vcf_filter
 
-trap : 0
+	done
 
-echo >&2 '
+end_log 8 "filter-vcf-RGO"
+
+fi
+
+### DELETE TEMP DIR
+rm -r ${INDIR}/${DEDUP}
+rm -r ${INDIR}/${MAPPING}
+rm -r ${INDIR}/${REALIGN}
+rm ${INDIR}/${FASTQ}/ALL_SAMPLES_L001_R1_001.fastq
+rm ${INDIR}/${FASTQ}/ALL_SAMPLES_L001_R2_001.fastq
+
+
+trap : 0x
+
+echo >&3 '
 ************
 *** DONE *** 
 ************

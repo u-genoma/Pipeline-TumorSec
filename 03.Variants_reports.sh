@@ -54,8 +54,18 @@ while (( "$#" )); do
 done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
-   	
+
+
 source $INPUT_DATA
+
+get_samples(){
+	cd "${INDIR}/${FASTQ}"
+	echo $PWD
+	#GET SAMPLES ID FROM FASTQ FILES
+	SAMPLES=$(ls *R1_*.fastq.gz| awk '{split($0,array,"_")} {print array[1]"_"array[2]}')
+}
+
+get_samples
    	
 #####################################
 #                                   #
@@ -95,25 +105,29 @@ source $INPUT_DATA
         Rscript $PLOTS_TABLAS_VARIANTES ${INDIR} $SAMPLES
         
         #### ALL SAMPLES VCF
-		cd ${INDIR}/${ANNOTATE}
-    	echo "java ${GATK} -T CombineVariants -R ${hg19_fa} \\" >> merge_command.sh
+		cd ${INDIR}/${ANNOVAR_ANOT}
+    	echo "java -jar ${GATK} -T CombineVariants -R ${hg19_fa} \\" >> merge_command.sh
     	for i in $SAMPLES; do echo "--variant:${i} ${i}.annovar.hg19_multianno.vcf \\" >> merge_command.sh ; done
     	echo "-o ALL_SAMPLES.annovar.hg19_multianno.vcf -genotypeMergeOptions UNIQUIFY" >> merge_command.sh
     	sh merge_command.sh
     	rm merge_command.sh
         
-        INPUT_VCF="${INDIR}/${ANNOTATE}/ALL_SAMPLES.annovar.hg19_multianno.vcf"
+        INPUT_VCF="${INDIR}/${ANNOVAR_ANOT}/ALL_SAMPLES.annovar.hg19_multianno.vcf"
         Rscript $PLOT_DP $INPUT_VCF ${INDIR}/${IMAGES_REPORT}
+        
+        CGI_OUTPUT="${INDIR}/${CGI}/list_CGI_MA_rename.txt"
+        
+        Rscript $CGI_MAF_ONCOPLOT $CGI_OUTPUT "${INDIR}/${IMAGES_REPORT}/" "${INDIR}/${CGI}"  $AF $ExAC $DP_ALT 
         
         #### MAKE PDF WITH THE VARIANTS REPORT
         echo "python $REPORTE_VARIANTES -i ${INDIR} -s $SAMPLES"
-        python $REPORTE_VARIANTES -i ${INDIR} -s $SAMPLES
+        python $REPORTE_VARIANTES -i $INDIR -s $SAMPLES --logo $LOGO --img $INDIR/$IMAGES_REPORT --outputpdf $INDIR/$REPORT_PDF --ocov $INDIR/$SUMMARY_OUTPUTS
         
         #### MAKE EXCEL FILE PER SAMPLE WITH THE INFORMATION OF ANNOVAR, CGI ANNOTATION AND REGION TARGETS COVERAGE
         for sample in $SAMPLES
 		do
-			INPUT_VCF="${INDIR}/${ANNOTATE}/${sample}.annovar.hg19_multianno.vcf"
-			INPUT_TXT="${INDIR}/${ANNOTATE}/${sample}.annovar.hg19_multianno.txt"
+			INPUT_VCF="${INDIR}/${ANNOVAR_ANOT}/${sample}.annovar.hg19_multianno.vcf"
+			INPUT_TXT="${INDIR}/${ANNOVAR_ANOT}/${sample}.annovar.hg19_multianno.txt"
 			CSV_OUTPUT="${INDIR}/${SUMMARY_OUTPUTS}/${sample}_annovar.csv"
 			CGI_DRUG_PRESC="${INDIR}/${CGI}/${sample}/drug_prescription.tsv"
 			CGI_MUTATION="${INDIR}/${CGI}/${sample}/mutation_analysis.tsv"

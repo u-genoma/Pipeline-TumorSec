@@ -39,17 +39,16 @@ def main():
     corrida=path_input.split('/')[-1]
 
     ##### GEN SUMMARY
-    data =path_input+"/12_variants_report/12.3_summary_output/gene_summary_ANNOVAR.csv"
+    data =output_coverage+"/gene_summary.csv"
     gen_summary = pd.read_csv(data,delimiter=',', skip_blank_lines=True)
     df_gen_summary = pd.DataFrame(gen_summary)
 
     #### NUM VARIANTS BY SAMPLE
-    data =path_input+"/12_variants_report/12.3_summary_output/summary_variantes_per_sample.csv"
+    data =output_coverage+"/summary_variantes_per_sample.csv"
     variants_by_sample = pd.read_csv(data,delimiter=',', skip_blank_lines=True)
     df_variants_by_sample = pd.DataFrame(variants_by_sample)
 
     pdf_report(corrida,path_input,df_variants_by_sample,df_gen_summary,output_pdf,output_plots,logo)
-
     print("Reporte de variantes ---> LISTO!!!")
 
 def pdf_report(corrida,path_input,df_variants_by_sample,df_gen_summary,output_pdf,output_plots,logo):
@@ -162,7 +161,7 @@ def pdf_report(corrida,path_input,df_variants_by_sample,df_gen_summary,output_pd
     pdf.cell(-40)
     pdf.ln(5)
     pdf.set_font('arial', '', 8)
-    pdf.image(output_plots+'/plot_summary_ANNOVAR.png', x = None, y = None, w = 150, h = 150, type = 'png', link = '')
+    pdf.image(output_plots+'/plot_summary.png', x = None, y = None, w = 150, h = 150, type = 'png', link = '')
     pdf.cell(120, 5,"Imagen 4: Resumen de las mutaciones de la corrida (ANNOVAR)", 0, 2, 'L')
 
     pdf.output(output_pdf+'/Reporte_Variantes'+corrida+'.pdf', 'F')

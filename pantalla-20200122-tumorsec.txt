@@ -1,0 +1,41 @@
+############################################
+     Welcome to the TumorSec pipeline
+############################################
+
+== Search for somatic variants of oncological importance ==
+Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile
+
+Comando: sh /home/egonzalez/workSpace/PipelineTumorSec/01.Run_TumorSec.sh --input--dir /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec --threads 10 --baseSpace /home/egonzalez/BaseSpace/Runs/Tumorsec20200122 --dendogram y --step 0-8 --input--data /home/egonzalez/workSpace/PipelineTumorSec/00.inputs_TumorSec.ini
+
+Thu Jan 23 15:37:03 -03 2020 : step 0 - start - demultiplexing
+Thu Jan 23 15:37:03 -03 2020 : step 0 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_demultiplexing.out
+Thu Jan 23 16:55:20 -03 2020 : step 0 - finished - demultiplexing
+Thu Jan 23 16:55:20 -03 2020 : step 1 - start - trimming
+Thu Jan 23 16:55:20 -03 2020 : step 1 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/1_log_trimming.out
+Thu Jan 23 16:55:20 -03 2020 : step 1 - start - trimming
+Thu Jan 23 16:55:20 -03 2020 : step 1 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/1_log_trimming.out
+Thu Jan 23 16:56:33 -03 2020 : step 1 - finished - trimming
+Thu Jan 23 16:56:33 -03 2020 : step 2 - start - mapping
+Thu Jan 23 16:56:33 -03 2020 : step 2 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/2_log_mapping.out
+Thu Jan 23 17:52:41 -03 2020 : step 2 - finished - mapping
+Thu Jan 23 17:52:41 -03 2020 : step 3 - start - remove-Duplicates
+Thu Jan 23 17:52:41 -03 2020 : step 3 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/3_log_remove-Duplicates.out
+Thu Jan 23 18:34:47 -03 2020 : step 3 - finished - remove-Duplicates
+Thu Jan 23 18:34:47 -03 2020 : step QC-Report-1 - start - quality-metrics
+Thu Jan 23 18:34:47 -03 2020 : step QC-Report-1 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/QC-Report-1_log_quality-metrics.out
+Thu Jan 23 18:34:47 -03 2020 : step 4 - start - realign-indels
+Thu Jan 23 18:34:47 -03 2020 : step 4 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/4_log_realign-indels.out
+Thu Jan 23 20:45:36 -03 2020 : step 4 - finished - realign-indels
+Thu Jan 23 20:45:36 -03 2020 : step 5 - start - recalibration
+Thu Jan 23 20:45:36 -03 2020 : step 5 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/5_log_recalibration.out
+Fri Jan 24 00:40:17 -03 2020 : step 5 - finished - recalibration
+Fri Jan 24 00:40:17 -03 2020 : step QC-Report-2 - start - dendogram
+Fri Jan 24 00:40:17 -03 2020 : step QC-Report-2 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/QC-Report-2_log_dendogram.out
+Fri Jan 24 00:40:17 -03 2020 : step 6 - start - varcall
+Fri Jan 24 00:40:17 -03 2020 : step 6 - logfile - /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/6_log_varcall.out
+
+***************
+*** ABORTED ***
+***************
+
+An error occurred. Exiting...

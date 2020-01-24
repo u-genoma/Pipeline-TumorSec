@@ -20,20 +20,20 @@ Samples=args[2:length(args)]
 print(Samples)
 col = c("#C93312", "#C27D38", "#899DA4", "#29211F", "#D8B70A", "#02401B", "#5B1A18", "#81A88D", "#F8AFA8", "#CCC591", "#C93312", "#FAEFD1", "#DC863B")
 
-filenames <- Sys.glob(paste0(path_input,"/9_annotate/*.annovar.hg19_multianno.txt"))
+filenames <- Sys.glob(paste0(path_input,"/6_annotate/6.1_ANNOVAR/*.annovar.hg19_multianno.txt"))
 annovar_mafs = lapply(filenames, annovarToMaf) #convert to MAFs using annovarToMaf
 annovar_mafs = data.table::rbindlist(l = annovar_mafs, fill = TRUE) #Merge into single MAF
 
-write.table(annovar_mafs,file = paste0(path_input,"/12_variants_report/12.3_summary_output/MAF_ANNOVAR.maf"), sep ='\t', quote=FALSE)
+write.table(annovar_mafs,file = paste0(path_input,"/7_variants_report/7.3_summary_output/MAF_ANNOVAR.maf"), sep ='\t', quote=FALSE)
 
 vcNames <- names(table(annovar_mafs$Variant_Classification))
 annovar_mafs = read.maf(maf = annovar_mafs) #use read.maf to generate MAF object
 
 Summary<-mafSummary(annovar_mafs) ### METRICS
 
-write.csv(Summary$gene.summary,paste0(path_input,"/12_variants_report/12.3_summary_output/gene_summary.csv"))
+write.csv(Summary$gene.summary,paste0(path_input,"/7_variants_report/7.3_summary_output/gene_summary.csv"))
 print("gene_summary CSV ----> LISTO !!!")
-write.csv(Summary$variants.per.sample,paste0(path_input,"/12_variants_report/12.3_summary_output/num_variants_by_sample.csv"))
+write.csv(Summary$variants.per.sample,paste0(path_input,"/7_variants_report/7.3_summary_output/num_variants_by_sample.csv"))
 print("num_variants_by_sample CSV ----> LISTO !!!")
 
 By_sample_summary<-Summary$variant.type.summary
@@ -41,14 +41,14 @@ By_sample_summary<-Summary$variant.type.summary
 vcNames[length(vcNames)+1]='Multi_Hit'
 names(col) = vcNames
 
-png(filename=paste0(path_input,"/12_variants_report/12.4_Images/oncoplot_ANNOVAR.png"))
+png(filename=paste0(path_input,"/7_variants_report/7.4_Images/oncoplot_ANNOVAR.png"))
 oncoplot(maf =annovar_mafs , top = 20, showTumorSampleBarcodes = TRUE, SampleNamefontSize = 0.6, legendFontSize = 1.5, removeNonMutated = FALSE, fontSize=0.8, annotationFontSize=0.3)
 #dev.copy(png,paste0(path_input,"/12_variants_report/12.4_Images/oncoplot.png"))
 dev.off()
 print("Gráfico Oncoplot ---> LISTO!!")
 
 
-png(filename=paste0(path_input,"/12_variants_report/12.4_Images/plot_summary.png"))
+png(filename=paste0(path_input,"/7_variants_report/7.4_Images/plot_summary.png"))
 plotmafSummary(maf=annovar_mafs, rmOutlier = TRUE, addStat = 'median', dashboard = TRUE, titvRaw = FALSE, showBarcodes = TRUE, textSize = 0.6, color =col)# oncoplot(maf = laml, top = 10)
 #dev.copy(png,paste0(path_input,"/12_variants_report/12.4_Images/plot_summary.png"))
 dev.off()
@@ -63,8 +63,8 @@ colnames(CGI_summary) <- columnas
 #### Ingresamos la ruta del CGI
 for(sample in Samples){
   
-  mutation_analysis_file<-paste0(path_input,"/11_CGI/",sample,"/mutation_analysis.tsv")
-  drug_rescrption_file<-paste0(path_input,"/11_CGI/",sample,"/drug_prescription.tsv")
+  mutation_analysis_file<-paste0(path_input,"/6_annotate/6.2_CGI/",sample,"/mutation_analysis.tsv")
+  drug_rescrption_file<-paste0(path_input,"/6_annotate/6.2_CGI/",sample,"/drug_prescription.tsv")
 
   mutation_analysis <- read.csv(file=mutation_analysis_file, header=TRUE, sep ='\t')
   drug_prescription <- read.csv(file=drug_rescrption_file, header=TRUE, sep ='\t')
@@ -88,7 +88,7 @@ for(sample in Samples){
 }
 
 total <- merge(By_sample_summary,CGI_summary,by="Tumor_Sample_Barcode")
-write.csv(total,paste0(path_input,"/12_variants_report/12.3_summary_output/summary_variantes_per_sample.csv"))
+write.csv(total,paste0(path_input,"/7_variants_report/7.3_summary_output/summary_variantes_per_sample.csv"))
 print("summary_variantes_per_sample CSV ----> LISTO !!!")
 
 

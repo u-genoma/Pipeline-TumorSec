@@ -8,7 +8,7 @@
 # Descripcion: A partir de un archivo txt que contiene una lista de rutas absolutas de archivos .bam (una por linea)
 # se calcula la distancia de manhatahn entre las diferentes muestras a partir de las variantes obtenidas por HaplotypeCaller
 # 
-# EXAMPLE: sh 01_quality_control_dendogram.sh -l /path/to/list_of_bam.txt -o path/to/output/directory -dp 250 -maf 0.05 -gm 0.5 -gs 0.8
+# Ejemplo de ejecución: sh 01_quality_control_dendogram.sh -l /path/to/list_of_bam.txt -o path/to/output/directory -dp 250 -maf 0.05 -gm 0.5 -gs 0.8
 #
 # Los filtros por defecto que se realizan en este pipeline son los siguientes:
 # 1) Solo SNV en regiones targets con una profundidad >=250.
@@ -29,14 +29,14 @@
 
 
 ## OUTPUT DIRECTORY
-HC="1_HaplotypeCaller"
-VCF="2_VCFs"
+HC="1_haplotypecaller"
+VCF="2_vcfs"
 PLINK="3_plink"
 DENDO="4_dendogram"
 
 abort()
 {
-    echo >&2 '
+    echo >&2'
 ***************
 *** ABORTED ***
 ***************
@@ -99,11 +99,10 @@ done
 eval set -- "$PARAMS"
 
 
-
 FILES_BAM=$(cat $BAM )
 
 source $INPUT_DATA
-
+<<HOLA
 ####################################################
 #                                                  #
 # 1. RUN HAPLOTYPECALLER (GATK) AND RUN DP FILTER  #
@@ -131,17 +130,18 @@ if [ ! -d "${OUTDIR}/${HC}" ]; then
         		 --dbsnp $dbsnp_138_hg19 \
         		 -L $HG19_OncoChile_bed \
         		 --emitRefConfidence GVCF \
-        		 --max_alternate_alleles 2 \
            		 -o $OUTFILE
            		 
            		 INPUT=$OUTFILE
         		 OUTPUT="${OUTDIR}/${HC}/${sample}_HC_rename.g.vcf"
         		 
+        		 ## add samples names
         		 java -jar $PICARD RenameSampleInVcf \
         		 INPUT=$INPUT \
         		 OUTPUT=$OUTPUT \
         		 NEW_SAMPLE_NAME=$sample
 				 
+				 ## dp filter fo variants
 				 echo "Filtro DP $DP"
 		         DP_select="'vc.getGenotype(\""$sample"\").getDP() > $DP'"
 		         echo "$DP_select"
@@ -166,8 +166,7 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
         
         #rm "$OUTDIR/$VCF/comand_merge_all_gVCF.sh"
         
-        echo "java -jar $GATK \
-        -T CombineGVCFs -R $hg19_fa \\" > "$OUTDIR/$VCF/comand_merge_all_gVCF.sh"
+        echo "java -jar $GATK -T GenotypeGVCFs -R $hg19_fa \\" > "$OUTDIR/$VCF/comand_merge_all_gVCF.sh"
         cd "${OUTDIR}/${HC}"
         
         echo "${OUTDIR}/${HC}"
@@ -181,18 +180,19 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 				echo "--variant $PWD/$sample \\" >> "${OUTDIR}/${VCF}/comand_merge_all_gVCF.sh"
 		done
 		
-		echo "-o ${OUTDIR}/${VCF}/01_ALL_SAMPLES.vcf" >> "${OUTDIR}/${VCF}/comand_merge_all_gVCF.sh"
+		echo "-o ${OUTDIR}/${VCF}/1_all_samples_TumorSec.vcf" >> "${OUTDIR}/${VCF}/comand_merge_all_gVCF.sh"
 		
 		echo "RUNING MERGE ALL GVCFs"
 		sh "${OUTDIR}/${VCF}/comand_merge_all_gVCF.sh"
+
 
 ##################################
 #                                #
 # 3. ANNOTATE RSID FOR GVCF      #
 ##################################
 
-			ALL_SAMPLES_VCF="${OUTDIR}/${VCF}/01_ALL_SAMPLES.vcf"
-			ALL_SAMPLES_VCF_ANNOTATED="${OUTDIR}/${VCF}/02_ALL_SAMPLES_ANNOTATED.vcf"
+			ALL_SAMPLES_VCF="${OUTDIR}/${VCF}/1_all_samples_TumorSec.vcf"
+			ALL_SAMPLES_VCF_ANNOTATED="${OUTDIR}/${VCF}/2_all_samples_TumorSec_annotated.vcf"
 			
 			java -jar $GATK \
 			-R $hg19_fa \
@@ -206,20 +206,20 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 # 4. SELECT INDELS AND DELETE MULTIALLELIC  #
 #############################################
 
-			ALL_SAMPLES_VCF_ANNOTATED_RSID="${OUTDIR}/${VCF}/03_ALL_SAMPLES_ANNOTATED_RSID.vcf"
-			ALL_SAMPLES_VCF_ANNOTATED="${OUTDIR}/${VCF}/02_ALL_SAMPLES_ANNOTATED.vcf"
+			ALL_SAMPLES_VCF_ANNOTATED_RSID="${OUTDIR}/${VCF}/3_all_samples_annotated_RSID.vcf"
+			ALL_SAMPLES_VCF_ANNOTATED="${OUTDIR}/${VCF}/2_all_samples_TumorSec_annotated.vcf"
+			
 			java -jar $GATK \
 			-R $hg19_fa \
 			-T SelectVariants \
 			--variant $ALL_SAMPLES_VCF_ANNOTATED \
-			--selectTypeToExclude INDEL \
+			-selectType SNP \
 			-o $ALL_SAMPLES_VCF_ANNOTATED_RSID 
-			#-restrictAllelesTo BIALLELIC
 			
 			grep "^chr" $ALL_SAMPLES_VCF_ANNOTATED_RSID | awk -F "\t" '{if($3!=".") print $3}' > ${OUTDIR}/${VCF}/list_rsid.txt
 			grep "^#" $ALL_SAMPLES_VCF_ANNOTATED_RSID > ${OUTDIR}/${VCF}/HEAD.txt
 			grep "^chr" $ALL_SAMPLES_VCF_ANNOTATED_RSID | awk -F "\t" '{if($3!=".") print $0}' > ${OUTDIR}/${VCF}/BODY.txt
-			cat ${OUTDIR}/${VCF}/HEAD.txt ${OUTDIR}/${VCF}/BODY.txt > ${OUTDIR}/${VCF}/04_ALL_SAMPLES_ANNOTATED_ONLY_RSID.vcf
+			cat ${OUTDIR}/${VCF}/HEAD.txt ${OUTDIR}/${VCF}/BODY.txt > ${OUTDIR}/${VCF}/4_all_samples_annotated_only_RSID.vcf
 
 			
 			echo ".................................."
@@ -227,7 +227,7 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 			cat ${OUTDIR}/${VCF}/list_rsid.txt | wc -l
 			echo ".................................."
             
-            FINAL_VCF="${OUTDIR}/${VCF}/04_ALL_SAMPLES_ANNOTATED_ONLY_RSID.vcf"
+            FINAL_VCF="${OUTDIR}/${VCF}/4_all_samples_annotated_only_RSID.vcf"
 			
 			     
 #############################################
@@ -243,6 +243,7 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 		
 	   	plink1.9 --vcf $FINAL_VCF \
 	   	--freq --out ${OUTDIR}/${PLINK}/freq_counts
+
 	   
 ######################################
 #                                    #
@@ -254,19 +255,20 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
   
         cat ${OUTDIR}/${PLINK}/freq_counts.frq | awk '{if($5<0.05) print $2}' > ${OUTDIR}/${VCF}/list_vcf_exclude.txt
         
-        OUTPUT_VCF="${OUTDIR}/${VCF}/05_ALL_SAMPLES_ANNOTATED_ONLY_RSID_MAF.vcf"
+        OUTPUT_VCF="${OUTDIR}/${VCF}/5_all_samples_annotated_only_RSID_MAF.vcf"
+        FINAL_VCF="${OUTDIR}/${VCF}/4_all_samples_annotated_only_RSID.vcf"
         
         java -jar $GATK \
-		-R $hg19_fa \
 		-T SelectVariants \
+		-R $hg19_fa \
 		--variant $FINAL_VCF \
-		--select-type-to-include SNP \
-		--exclude-ids ${OUTDIR}/${VCF}/list_vcf_exclude.txt \
+		--excludeIDs ${OUTDIR}/${VCF}/list_vcf_exclude.txt \
 		-o $OUTPUT_VCF
         
   		plink1.9 --recode \
 		--vcf $OUTPUT_VCF \
 		--out ${OUTDIR}/${PLINK}/all_samples
+
 
 ################################
 #                              #
@@ -280,8 +282,8 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 		cat ${OUTDIR}/${PLINK}/SETPLINK.tsv >> ${OUTDIR}/${PLINK}/SETPLINK_2.tsv
         
         ### remplazar 00 por 0 en la matriz
-        cat ${OUTDIR}/${PLINK}/SETPLINK_2.tsv | sed 's/00/0/g' > {OUTDIR}/${PLINK}/SETPLINK_3.tsv
-        
+        cat ${OUTDIR}/${PLINK}/SETPLINK_2.tsv | sed 's/00/0/g' > ${OUTDIR}/${PLINK}/SETPLINK_3.tsv
+HOLA
 #####################################
 #                                   #
 # 9. CREATE DENDOGRAM  AND PLOTS    #
@@ -291,9 +293,15 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
                 mkdir "${OUTDIR}/${DENDO}"
         else
                 echo "The ${OUTDIR}/${DENDO} directory alredy exists"
-                
+        fi       
         #INPUTS 1. MATRIZ OF GENO 2. % OF GENO FOR SNP 3. % OF GENO FOR SAMPLE 4. OUTOUTDIR
-        Rscript $GENERATE_DENDOGRAM ${OUTDIR}/${PLINK}/SETPLINK_3.tsv $PCT_GT_SNV $PCT_GT_SAMPLES ${OUTDIR}/${DENDOGRAM}
+        echo "Rscript $GENERATE_DENDOGRAM ${OUTDIR}/${PLINK}/SETPLINK_3.tsv $PCT_GT_SNV $PCT_GT_SAMPLES ${OUTDIR}/${DENDO}"
+        Rscript $GENERATE_DENDOGRAM ${OUTDIR}/${PLINK}/SETPLINK_3.tsv $PCT_GT_SNV $PCT_GT_SAMPLES ${OUTDIR}/${DENDO}
+        
+end_log "QC-Report-1" "quality-metrics"
+
+echo "$(date) : step QC-Report-2 - finished - dendogram" >&3
+
         
 trap : 0
 

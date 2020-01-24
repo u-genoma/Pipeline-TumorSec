@@ -64,7 +64,7 @@ source $INPUT_DATA
     cd "${INDIR}/${FASTQ}"
 	SAMPLES=$(ls *R1_*.fastq.gz| awk '{split($0,array,"_")} {print array[1]"_"array[2]}')
 
-<<HOLA	 
+	 
 #################################
 #                               #
 #            FASTQC             #
@@ -80,7 +80,9 @@ source $INPUT_DATA
 	
 	unzip -o ALL_SAMPLES_L001_R1_001_fastqc.zip
 	unzip -o ALL_SAMPLES_L001_R2_001_fastqc.zip
-
+	
+	rm ALL_SAMPLES_L001_R1_001_fastqc.zip
+	rm ALL_SAMPLES_L001_R2_001_fastqc.zip
 	
 ###########################################
 #                                         #
@@ -125,7 +127,6 @@ source $INPUT_DATA
         cd ${INDIR}
         multiqc -f "${INDIR}" -p 
 
-        
 #####################################
 #                                   #
 #        CREATE DIRECTORIES         #
@@ -203,7 +204,6 @@ source $INPUT_DATA
         ######## COMPLEMENT REPORT 
         python $COMPLEMENT_REPORT -i $INDIR/$DEDUP -s $SAMPLES -opdf $INDIR/$REPORT -ocov $INDIR/$OUTPUT_COV_TARGET -l $LOGO -m $INDIR/$PLOTS
 
-HOLA
         ######## GENERATE REPORT OF RUN, WITH THE TABLES AND PLOTS
         echo "python $GENERAL_REPORT -i $INDIR -s $SAMPLES -opdf $INDIR/$REPORT -ocov $INDIR/$OUTPUT_COV_TARGET -l $LOGO -m $INDIR/$PLOTS"
         python $GENERAL_REPORT -i $INDIR -s $SAMPLES -opdf $INDIR/$REPORT -ocov $INDIR/$OUTPUT_COV_TARGET -l $LOGO -m $INDIR/$PLOTS -kit $KIT_SEC

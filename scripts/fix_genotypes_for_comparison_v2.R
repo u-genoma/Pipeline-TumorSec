@@ -60,12 +60,13 @@ gtseq.dist <- dist(gtseq.na.sorted.numeric.polymorphic, method="manhattan")
 mclust <- hclust(gtseq.dist, method="average")
 #lab_order <- aperm(mclust$labels, mclust$order)
 lab_order <- mclust$labels[mclust$order]
-pdf(paste0(outputdir,"/dendograma.pdf"), width=5, height=10)
+pdf(paste0(outputdir,"/dendograma.pdf"), width=5, height=5)
   par(cex=.7, mar=c(8, 6, 2, 1))
   plot(as.dendrogram(mclust, hang=-1),
        leaflab = "none", xlab="", ylab="TumorSec samples", sub="manhattan distance", horiz=T)
   mtext(lab_order, side=4, at=1:length(mclust$labels), las=2, cex=.2, line=-1)
 dev.off()
+
 
 # Exportar los IDs de mismatches
 matched.samps <- cutree(mclust,  h = 3)

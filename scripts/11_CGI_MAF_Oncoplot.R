@@ -21,9 +21,10 @@ args <- commandArgs(trailingOnly = TRUE)
 print(args)
 list_CGI_inputs=args[1]
 path_output=args[2]
-AF=args[3]
-ExAC=args[4]
-DP_ALT=args[5]
+path_output_maf=args[3]
+AF=args[4]
+ExAC=args[5]
+DP_ALT=args[6]
 
 #list_CGI_inputs="/Users/evelin/Dropbox/CGI_oncoplot/list_CGI_inputs.txt" ### cambiar la ruta
 #path_output="/Users/evelin/Dropbox/CGI_oncoplot" ### oncoplot de salida.
@@ -110,10 +111,10 @@ for (i in 1:nrow(CGIs)){
 }
 all.data.cgi<-CGI_to_maft(all.data.merge)
 ### guardar datos sin filtrar
-save_maf(all.data.cgi,paste0(path_output,"/MAF_CGI_no_filter.maf"))
+save_maf(all.data.cgi,paste0(path_output_maf,"/MAF_CGI_no_filter.maf"))
 ### Filtrar datos
 data.cgi.filter<-filter_CGI(all.data.cgi,AF,ExAC,DP_ALT)
 ### guardar datos filtrados
-save_maf(data.cgi.filter,paste0(path_output,"/MAF_CGI_filter.maf"))
+save_maf(data.cgi.filter,paste0(path_output_maf,"/MAF_CGI_filter.maf"))
 
 create_oncoplots(data.cgi.filter,path_output)
