@@ -11,5 +11,5 @@ Una vez descargadas las bases de datos y la imagen docker, se debe ejecutar la i
 ### 3. Montar datos de BaseSpace en Docker
 ### 4. Configurar archivo con parametros de entrada
 ### 5. Ejecucion del Pipeline
-### 6. Archivos de salida e interpretación
+### 6. Archivos de salida e interpretación de resultados
 
