@@ -8,6 +8,9 @@ Una vez descargadas las bases de datos y la imagen docker, se debe ejecutar la i
  
 
 ### 1. Descargar bases de datos de ANNOVAR
+
+Ingresar datos en el siguiente link (http://download.openbioinformatics.org/annovar_download_form.php)
+
 #### 1.1 Instalar ANNOVAR de manera local
 
 #### 1.2 Descargar bases de datos
