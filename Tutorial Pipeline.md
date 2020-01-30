@@ -1,6 +1,6 @@
 ## Tutorial para la ejecución del Pipeline TumorSec
 
-A continuación se describen de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```, la cual se encuentra como un repositorio privado en el servidor Docker Hub.  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto. (ver sección 2)
+A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```, la cual, se encuentra como un repositorio privado en el servidor Docker Hub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto. (ver sección 2)
 
 Ademas, se deben descargar las bases de datos de entrada necesarias para ejecutar el software ANNOVAR, el cual, las utiliza para la anotación funcional de las variantes. La ruta local de descarga de las bases de dato se debe agregar al archivo de configuración de TumorSec (ver sección 1 y 4)
 
