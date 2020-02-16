@@ -53,6 +53,39 @@ Comandos para la descarga.
 
 
 ### 2. Descargar imagen docker Tumorsec
+
+El archivo ```Dockerfile``` contiene los pasos necesarios para instalar todos los pre-requisistos del pipeline TumorSec, ademas de las bases de datos y archivos especificos del pipeline. Utilizando la configuración del ```Dockerfile``` que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construye la imagen docker la cual es almacenada en un repositorio privado en DockerHub.
+
+El contexto para construir la imagen de docker para el pipeline TumorSec, se encuentra en la siguiente ruta
+```/home/egonzalez/workSpace/docker_PipelineTumorsec``` 
+
+Para volver a contruir la imagen de docker:
+```
+cd /home/egonzalez/workSpace/docker_PipelineTumorsec
+docker build -t lgc/tumorsec:0.1 .
+```
+Para verificar que se creó la nueva imagen:
+```
+docker images
+
+REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
+lgc/tumorsec             0.1                 5ea88887915c        25 hours ago        8.05GB
+
+```
+Podemos observar que la actual imagen de docker ```lgc/tumorsec:0.1```tiene un tamaño de 8.05 GB, aquellas bases de datos de mayor tamaño deben ser descargadas antes de ejecutar el pipeline de TumorSec. Es recomendable tener una imagen menor a 10 GB, para evitar la sobrecarga de datos temporales que efecta el funcionamiento del sistema operativo. El espacio de docker destinado a imagenes es limitado, en caso de sobrepasar el limite se deben reconfigurar los tamaños por defecto establecidos al momento de instalar docker.
+
+Una vez terminados los cambios de la imagen, se deben actulizar la imagen del repositorio en DockerHub
+
+
+
+Para volver a 
+
+
+```
+REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
+lgc/tumorsec             0.1                 5ea88887915c        25 hours ago        8.05GB
+```
+
 ### 3. Montar datos de BaseSpace en Docker
 ### 4. Configurar archivo con parametros de entrada
 ### 5. Ejecucion del Pipeline
