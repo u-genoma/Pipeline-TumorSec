@@ -73,6 +73,7 @@ Al ingresar podemos observar con ```ls``` los scripts necesarios para correr Tur
 sh DB_download.sh
 Enter the output directory:
 /mnt/home/egonzalez/DB_TumorSec
+
 ```
 
 Bases de datos descargadas para ANNOVAR
@@ -95,12 +96,19 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 
 ### 3. Montar datos de BaseSpace en Docker
 
+Para ejecutar el pipeline de TumorSec, es necesario montar los datos de baseSpace en la imagen docker. El programa basemount se encuentra instalado en la imagen.  Para montar los datos, se debe seguir las siguientes instrucciones.
+
+Se debe estar dentro de un contenedor creado a partir de la imagen, si no es así, ejecutar el siguiente comando:
+```
+docker run --privileged -ti -d --name tumorsecRUN  -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+```
+Luego se debe crear una carpeta BaseSpace y montar los datos:
+
 ```
 cd /Docker/
 mkdir BaseSpace
 basemount BaseSpace/
 
-[root@2efef00d36c2 Docker]# basemount BaseSpace/
 ,-----.                        ,--.   ,--.                         ,--.
 |  |) /_  ,--,--. ,---.  ,---. |   `.'   | ,---. ,--.,--.,--,--, ,-'  '-.
 |  .-.  \' ,-.  |(  .-' | .-. :|  |'.'|  || .-. ||  ||  ||      \'-.  .-'
@@ -119,12 +127,28 @@ You need to authenticate by opening this URL in a browser:
   https://basespace.illumina.com/oauth/device?code=p1k65
   
 ```
-Copiar el URL en el navegador e ingresar los datos de la cuenta TumorSec. 
-usuario:tumorsec
+Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec. 
+usuario:tumorsec@gmail.com
 contraseña: UDT-seq#19
 
-y de manera automáitica se montarán los datos de BaseSapce en la carpeta /BaseSpace
+Ahora podemos observar las corridas de tumorSec que fueron compartidas a la cuenta tumorsec@gmail.com
 
+```
+[root@2efef00d36c2 Docker]# cd BaseSpace/
+[root@2efef00d36c2 BaseSpace]# ls
+Projects  README  Runs
+[root@2efef00d36c2 BaseSpace]# cd Runs/
+[root@2efef00d36c2 Runs]# ls
+20190219 LIB ROCHE V1.1  P-DGT-R02         Tumorsec20200124  Tumorsec20200128
+Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
+[root@2efef00d36c2 Runs]# cd Tumorsec20200122/
+[root@2efef00d36c2 Tumorsec20200122]# pwd
+/Docker/BaseSpace/Runs/Tumorsec20200122
+[root@2efef00d36c2 Tumorsec20200122]#
+
+```
+Con la ruta de BaseSapce de la corrida en la imagen podemos ahora correr el pipeline de tumorSec. 
+ 
 
 ### 4. Configurar archivo con parametros de entrada
 
