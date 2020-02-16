@@ -75,7 +75,6 @@ Enter the output directory:
 /mnt/home/egonzalez/DB_TumorSec
 ```
 
-
 Bases de datos descargadas para ANNOVAR
 - refGene
 - AFR.sites.2015_08
@@ -90,9 +89,9 @@ Bases de datos descargadas para ANNOVAR
 - cosmic70
 - clinvar_20180603
 
-Bases de datos descargadas para el pipeline(GATK, SomaticSeq entre otros)
--Hg19
--dbsnp_138
+Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
+- Hg19
+- dbsnp_138
 
 ### 3. Montar datos de BaseSpace en Docker
 
