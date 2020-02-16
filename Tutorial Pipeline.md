@@ -1,15 +1,31 @@
 ## Tutorial para la ejecución del Pipeline TumorSec
 
-A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```, la cual, se encuentra como un repositorio privado en el servidor Docker Hub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto. (ver sección 2)
+A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ``` lgc/tumorsec:0.1```, la cual, se encuentra como un repositorio privado en el servidor Docker Hub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto. (ver sección 2)
 
 Ademas, se deben descargar las bases de datos de entrada necesarias para ejecutar el software ANNOVAR, el cual, las utiliza para la anotación funcional de las variantes. La ruta local de descarga de las bases de dato se debe agregar al archivo de configuración de TumorSec (ver sección 1 y 4)
 
 Una vez descargadas las bases de datos y la imagen docker, se debe ejecutar la imagen de docker de manera interactiva (parámetro -ti en docker run) y montar la cuenta de TumorSec dentro de del contenedor creado, de esta manera podemos acceder a los datos de BaseSpace, necesarios para el demultiplezado de datos y la generación de reportes. (ver seccion 3). Luego de estas configuraciones, podemos ejecutar el pipeline de Tumorsec. (ver sección 5)
+
+Para ejecutar este pipeline se asume instalado el programa docker de manera local en el servidor. Si no se encuentra instalado ejecutar sudo yum -y install docker. Este se encuentra instalado en el servidor Genoma3 de Genomedlab, y la version con la cual fue testeado este tutorial es la version 18.06.0-ce.
  
 
-### 1. Descargar bases de datos de ANNOVAR
+### 1. Descargar bases de datos de ANNOVAR y hg19
 
-Ingresar datos en el siguiente link (http://download.openbioinformatics.org/annovar_download_form.php)
+Como parte de la imagen de docker ``` lgc/tumorsec:0.1``` se agregó un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/Docker/TumorSec ``` de la imagen de docker. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
+
+Para ejecutar este script, se debe correr la imagen docker ``` lgc/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run). Se debe ejecutar el siguiente comando.
+
+```
+docker run --privileged -ti -d --name tumorsecRUN  -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave lgc/tumorsec:0.1 /bin/bash
+```
+Al ingresar podemos observar con ls los scripts necesarios para correr TurmorSec. Ejecutar el script e ingresar la ruta donde serán almacenadas de manera local las bases de datos, antecedido de /mnt/, a contiuación se observa un ejemplo de ejecucion.
+
+```sh DB_download.sh
+#Enter the output directory:
+/mnt/home/egonzalez/DB_TumorSec
+```
+
+
 
 #### 1.1 Instalar ANNOVAR de manera local
 
