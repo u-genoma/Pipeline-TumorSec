@@ -18,10 +18,11 @@ Para ejecutar este script, se debe correr la imagen docker ``` lgc/tumorsec:0.1`
 ```
 docker run --privileged -ti -d --name tumorsecRUN  -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave lgc/tumorsec:0.1 /bin/bash
 ```
-Al ingresar podemos observar con ls los scripts necesarios para correr TurmorSec. Ejecutar el script e ingresar la ruta donde serán almacenadas de manera local las bases de datos, antecedido de /mnt/, a contiuación se observa un ejemplo de ejecucion.
+Al ingresar podemos observar con ```ls``` los scripts necesarios para correr TurmorSec. Ejecutar el script e ingresar la ruta donde serán almacenadas de manera local las bases de datos, antecedido de /mnt/. A contiuación se observa un ejemplo de ejecucion.
 
-```sh DB_download.sh
-#Enter the output directory:
+```
+sh DB_download.sh
+Enter the output directory:
 /mnt/home/egonzalez/DB_TumorSec
 ```
 
