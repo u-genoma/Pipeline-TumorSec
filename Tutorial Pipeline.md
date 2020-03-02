@@ -119,13 +119,13 @@ Ejecutar el docker.
 ```
 docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-- ```docker run``` : Crea un container 
+- ```docker run``` : Crea un contenedor docker
 - ```--privileged``` : Da permisos root dentro del contenedor.
-- ```-ti``` : Permite crear un container interactivo.
-- ```--rm``` : Elimina el container al ingresar exit en la consola de este.
+- ```-ti``` : Permite crear un contenedor interactivo.
+- ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
 - ```-v datatumorsec:/docker``` : Monta el directorio /docker de la imagen en el volumen datatumorsec
-- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo container
-- ```-v /usr/bin/docker:/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo container 
+- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor
+- ```-v /usr/bin/docker:/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor
 - ```--mount type=bind,source=/,target=/mnt,bind-propagation=rslave```: Monta los datos del directorio raíz del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos.
 - ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de DockerHub 
 - ```/bin/bash```: El container ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
