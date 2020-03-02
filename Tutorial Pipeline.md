@@ -100,13 +100,25 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, logo del laboratorio ademas los script que conforman el pipeline TumorSec. Para que estos datos sea vizualizados por otros container de docker, es necesario crear un volumen que será utilizado para montar los datos que se encuentran en la image, de esta manera otros docker 'container', podran vizualizarlos. El en llamado de variantes Somaticseq ejecuta los containers de Vardict, Mutect1, Varscan y Lofreq dentro de ```labgenomicatumorsec/tumorsec:0.1```. Para que estos container vizualicen los datos de la imagen, se deden seguir las siguientes instrucciones. 
 
 Crear un volumen con el nombre datatumorsec
-```docker volume create datatumorsec```
+```
+docker volume create datatumorsec
+```
 
 Para verificar que fue creado:
-```docker volume ls```
+```
+docker volume ls
 
+DRIVER              VOLUME NAME
+local               datatumorsec
+```
 
+Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de ejecutar el docker ```docker run```
 
+Ejecutar el docker.
+
+```
+docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+```
 
 ```
 [root@9aa37fe30960 /]# tree -L 2 docker/
@@ -138,7 +150,7 @@ docker/
  
 
 
-### 3. Montar datos de BaseSpace en Docker
+### 4. Montar datos de BaseSpace en Docker
 
 Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace en la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
 
@@ -196,7 +208,7 @@ Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec. 
 
 
 
-### 4. Configurar archivo con parametros de entrada
+### 5. Configurar archivo con parametros de entrada
 
 Una vez montado el directorio de BaseSpace, es necesario proceder a configurar los parámetros de entrada para la ejecucion del pipeline. Para esto, se creó en la imagen TumorSec un archivo ```00.conf_docker.ini ``` en la carpeta ```/Docker/TumorSec ``` el cual será cargado al inicio de la ejecución del pipeline. Este archivo contiene los parámetros que se pueden modificar. Aquellos que no son modificables se encuentran en el archivo ```00.inputs_TumorSec.ini```, el cual no debe ser alterado.
 
@@ -241,7 +253,7 @@ DP="250" ## profundidad por SNV identificada.
 ```
 Una vez configurado los parámetros de entrada necesarios. Se puede ejecutar el pipeline de TumorSec.(paso 5)
 
-### 5. Ejecución del Pipeline
+### 6. Ejecución del Pipeline
 
 Para la ejecución del pipeline, una vez terminados los pasos anteriores, podemos correr el pipeline dentro del contenedor que configuramos, solo debemos ejecutar el programa ```01.Run_TumorSec.sh```
 
@@ -300,5 +312,5 @@ Actualmente existen problemas para ejecutar el llamado de variantes, este proces
 
 El problema actual, es que el docker-in-docker no esta montando los datos que se encuentran dentro de la imagen de TumorSec ```labgenomicatumorsec/tumorsec:0.1```. Por ejemplo, la base de datos COSMIC que no se descarga en el paso 2, si no, que se encuentra integrada en al imagen no puede ser leída al correr MuTect2 (que es un docker que se ejecuta dentro del docker TumorSec). 
 
-### 6. Archivos de salida e interpretación de resultados. 
+### 7. Archivos de salida e interpretación de resultados. 
 
