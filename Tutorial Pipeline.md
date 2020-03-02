@@ -12,8 +12,8 @@ Para ejecutar este pipeline se asume instalado el programa docker de manera loca
 
 El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
 
-Cuenta: tumorsec@gmail.com
-Contraseña:UDT-seq#19
+- Cuenta: tumorsec@gmail.com
+- Contraseña:UDT-seq#19
 
 El contexto para construir la imagen de docker para el pipeline TumorSec, se encuentra en la siguiente ruta
 ```/home/egonzalez/workSpace/docker_PipelineTumorsec``` 
@@ -119,9 +119,9 @@ Ejecutar el docker.
 ```
 docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-- ```docker run``` : crea un container 
+- ```docker run``` : Crea un container 
 - ```--privileged``` : Da permisos root dentro del contenedor.
-- ```-ti``` : permite crear un container interactivo.
+- ```-ti``` : Permite crear un container interactivo.
 - ```--rm``` : Elimina el container al ingresar exit en la consola de este.
 - ```-v datatumorsec:/docker``` : Monta el directorio /docker de la imagen en el volumen datatumorsec
 - ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo container
@@ -194,8 +194,8 @@ You need to authenticate by opening this URL in a browser:
   
 ```
 Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec. 
-usuario:tumorsec@gmail.com
-contraseña: UDT-seq#19
+- Usuario:tumorsec@gmail.com
+- Contraseña: UDT-seq#19
 
 Ahora podemos observar las corridas de TumorSec que fueron compartidas a la cuenta tumorsec@gmail.com
 
