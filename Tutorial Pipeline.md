@@ -117,8 +117,18 @@ Una vez creado el volumen, este será utilizado para montar el directorio ```/do
 Ejecutar el docker.
 
 ```
-docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --rm **-v datatumorsec:/docker** -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
+ >docker run
+ >--privileged
+-ti
+--rm
+-v datatumorsec:/docker
+-v /var/run/docker.sock:/var/run/docker.sock
+-v /usr/bin/docker:/usr/bin/docker
+--mount type=bind,source=/,target=/mnt,bind-propagation=rslave
+labgenomicatumorsec/tumorsec:0.1
+/bin/bash
 
 ```
 [root@9aa37fe30960 /]# tree -L 2 docker/
