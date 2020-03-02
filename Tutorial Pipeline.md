@@ -95,6 +95,49 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 - Hg19
 - dbsnp_138
 
+### 3 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
+
+Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, logo del laboratorio ademas los script que conforman el pipeline TumorSec. Para que estos datos sea vizualizados por otros container de docker, es necesario crear un volumen que será utilizado para montar los datos que se encuentran en la image, de esta manera otros docker 'container', podran vizualizarlos. El en llamado de variantes Somaticseq ejecuta los containers de Vardict, Mutect1, Varscan y Lofreq dentro de ```labgenomicatumorsec/tumorsec:0.1```. Para que estos container vizualicen los datos de la imagen, se deden seguir las siguientes instrucciones. 
+
+Crear un volumen con el nombre datatumorsec
+```docker volume create datatumorsec```
+
+Para verificar que fue creado:
+```docker volume ls```
+
+
+
+
+```
+[root@9aa37fe30960 /]# tree -L 2 docker/
+docker/
+|-- BaseSpace
+|-- Inputs_TumorSec
+|   |-- MiSeq_ReagentKitV2.csv
+|   |-- genome
+|   |-- logo_lab.png
+|   `-- targets
+|-- programas
+|   |-- GenomeAnalysisTK.jar
+|   |-- annovar
+|   |-- fastp
+|   |-- picard.jar
+|   `-- somaticseq
+`-- tumorSec
+    |-- 00.conf_docker.ini
+    |-- 00.inputs_TumorSec.ini
+    |-- 01.Run_TumorSec.sh
+    |-- 02.QC_Reports.sh
+    |-- 03.Variants_reports.sh
+    |-- 04.QC_dendogram.sh
+    |-- DB_download.sh
+    |-- complement
+    `-- scripts
+    
+ ```
+ 
+
+
 ### 3. Montar datos de BaseSpace en Docker
 
 Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace en la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
@@ -150,6 +193,8 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 ```
 
 Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec. Ojo: Hasta el momento cada vez que se corre ```docker run```, se debe montar la carpeta de baseSpace (ejecutar paso 2). Existe una manera de realizar cambios al ejecutar la imagen docker (crear un contenedor) y guardar este contenedor con docker push en DockerHub, sin embargo, todavia no se encuentra implementado.  
+
+
 
 ### 4. Configurar archivo con parametros de entrada
 
