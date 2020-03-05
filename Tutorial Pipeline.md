@@ -8,7 +8,27 @@ Una vez descargadas las bases de datos y la imagen docker, se debe ejecutar la i
 
 Para ejecutar este pipeline se asume instalado el programa docker de manera local en el servidor. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker```. En el servidor Genoma3 de Genomedlab el programa docker con la cual fue testeado este tutorial es la version 18.06.0-ce.
 
-### 1. Descargar imagen docker Tumorsec
+### 1. Configuración de usuario.
+
+Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesario que el usuario tenga los permisos para ejecutar docker. Para esto, el administrador(a) del sistema (o un usuario con permisos root) debe se debe agregar al usuario al grupo docker del host.  En caso de no existir grupo docker, este tambien debe ser creado. 
+
+```
+groupadd --system docker
+sudo usermod -aG docker TestDockerTumorSec
+```
+Para verificar que el usuario puede ejecutar docker.
+```
+docker image ls 
+
+REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
+labgenomicatumorsec/tumorsec   0.1                 f51393d2badf        4 days ago          9.16GB
+centos                         7                   5e35e350aded        3 months ago        203MB
+
+```
+En caso de arrojar error, reinicie el servicio docker.
+
+
+### 2. Descargar imagen docker Tumorsec
 
 El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
 
@@ -61,7 +81,7 @@ labgenomicatumorsec/tumorsec   0.1                 5ea88887915c        27 hours 
 ```
 Una vez descargada, podemos comenzar a descargar las bases de datos necesarioas para TumorSec.
 
-### 2. Descargar bases de datos de ANNOVAR y hg19
+### 3. Descargar bases de datos de ANNOVAR y hg19
 
 Como parte de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` se agregó un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/Docker/TumorSec ``` de la imagen de docker. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
 
@@ -95,7 +115,7 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 - Hg19
 - dbsnp_138
 
-### 3 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
+### 4 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
 
 Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, logo del laboratorio ademas los script que conforman el pipeline TumorSec. Para que estos datos sea vizualizados por otros container de docker, es necesario crear un volumen que será utilizado para montar los datos que se encuentran en la image, de esta manera otros docker 'container', podran vizualizarlos. El en llamado de variantes Somaticseq ejecuta los containers de Vardict, Mutect1, Varscan y Lofreq dentro de ```labgenomicatumorsec/tumorsec:0.1```. Para que estos container vizualicen los datos de la imagen, se deden seguir las siguientes instrucciones. 
 
@@ -160,7 +180,7 @@ docker/
     
  ```
 
-### 4. Montar datos de BaseSpace en Docker
+### 5. Montar datos de BaseSpace en Docker
 
 Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace en la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
 
