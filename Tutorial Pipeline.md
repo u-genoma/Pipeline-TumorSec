@@ -59,13 +59,12 @@ labgenomicatumorsec/tumorsec:0.1 /bin/bash
 Siendo ```/path/to/output_DB```el directorio de salida donde se descargarán las bases de datos en el host. Dentro de la imagen Docker, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```.
 
 Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/Docker/TumorSec ```podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta donde serán almacenadas las bases de datos. A contiuación se observa un ejemplo:
-
 ```
 sh DB_download.sh
 Enter the output directory:
 /mnt/docker/DB_TumorSec
 ```
-*La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuracion por defecto, por tanto, no debe modificarse.
+La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, no es un parámetro modificable.
 
 Bases de datos descargadas para ANNOVAR
 - refGene
@@ -87,13 +86,12 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 
 #### 4 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
 
-Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, logo del laboratorio ademas los script que conforman el pipeline TumorSec. Para que estos datos sea vizualizados por otros container de docker, es necesario crear un volumen que será utilizado para montar los datos que se encuentran en la image, de esta manera otros docker 'container', podran vizualizarlos. El en llamado de variantes Somaticseq ejecuta los containers de Vardict, Mutect1, Varscan y Lofreq dentro de ```labgenomicatumorsec/tumorsec:0.1```. Para que estos container vizualicen los datos de la imagen, se deden seguir las siguientes instrucciones. 
+Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la image, de esta manera otros contenedores podrán vizualizarlos.
 
-Crear un volumen con el nombre datatumorsec
+Crear un volumen con el nombre ```datatumorsec```
 ```
 docker volume create datatumorsec
 ```
-
 Para verificar que fue creado:
 ```
 docker volume ls
@@ -101,54 +99,7 @@ docker volume ls
 DRIVER              VOLUME NAME
 local               datatumorsec
 ```
-
-Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de ejecutar el docker ```docker run```
-
-Ejecutar el docker.
-
-```
-docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
-```
-- ```docker run``` : Crea un contenedor docker
-- ```--privileged``` : Da permisos root dentro del contenedor.
-- ```-ti``` : Permite crear un contenedor interactivo.
-- ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
-- ```-v datatumorsec:/docker``` : Monta el directorio /docker de la imagen en el volumen datatumorsec
-- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor
-- ```-v /usr/bin/docker:/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor
-- ```--mount type=bind,source=/,target=/mnt,bind-propagation=rslave```: Monta los datos del directorio raíz del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos.
-- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de DockerHub 
-- ```/bin/bash```: El container ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
-
-Una vez ejecutado el comando anterior podemos vizualizar los datos montados en ```datatumorsec```, datos que son propios de la imagen TumorSec.
-
-```
-[root@9aa37fe30960 /]# tree -L 2 docker/
-docker/
-|-- BaseSpace
-|-- Inputs_TumorSec
-|   |-- MiSeq_ReagentKitV2.csv
-|   |-- genome
-|   |-- logo_lab.png
-|   `-- targets
-|-- programas
-|   |-- GenomeAnalysisTK.jar
-|   |-- annovar
-|   |-- fastp
-|   |-- picard.jar
-|   `-- somaticseq
-`-- tumorSec
-    |-- 00.conf_docker.ini
-    |-- 00.inputs_TumorSec.ini
-    |-- 01.Run_TumorSec.sh
-    |-- 02.QC_Reports.sh
-    |-- 03.Variants_reports.sh
-    |-- 04.QC_dendogram.sh
-    |-- DB_download.sh
-    |-- complement
-    `-- scripts
-    
- ```
+Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de ejecutar el docker ```docker run``` (Sección 2)
 
 #### 1.5. Montar datos de BaseSpace en Docker
 
@@ -252,6 +203,52 @@ Una vez configurado los parámetros de entrada necesarios. Se puede ejecutar el 
 
 #### 1.6 Ejecución del Pipeline
 Para la ejecución del pipeline, una vez terminados los pasos anteriores, podemos correr el pipeline dentro del contenedor que configuramos, solo debemos ejecutar el programa ```01.Run_TumorSec.sh```
+
+Ejecutar el docker.
+
+```
+docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+```
+- ```docker run``` : Crea un contenedor docker
+- ```--privileged``` : Da permisos root dentro del contenedor.
+- ```-ti``` : Permite crear un contenedor interactivo.
+- ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
+- ```-v datatumorsec:/docker``` : Monta el directorio /docker de la imagen en el volumen datatumorsec
+- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor
+- ```-v /usr/bin/docker:/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor
+- ```--mount type=bind,source=/,target=/mnt,bind-propagation=rslave```: Monta los datos del directorio raíz del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos.
+- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de DockerHub 
+- ```/bin/bash```: El container ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
+
+Una vez ejecutado el comando anterior podemos vizualizar los datos montados en ```datatumorsec```, datos que son propios de la imagen TumorSec.
+
+```
+[root@9aa37fe30960 /]# tree -L 2 docker/
+docker/
+|-- BaseSpace
+|-- Inputs_TumorSec
+|   |-- MiSeq_ReagentKitV2.csv
+|   |-- genome
+|   |-- logo_lab.png
+|   `-- targets
+|-- programas
+|   |-- GenomeAnalysisTK.jar
+|   |-- annovar
+|   |-- fastp
+|   |-- picard.jar
+|   `-- somaticseq
+`-- tumorSec
+    |-- 00.conf_docker.ini
+    |-- 00.inputs_TumorSec.ini
+    |-- 01.Run_TumorSec.sh
+    |-- 02.QC_Reports.sh
+    |-- 03.Variants_reports.sh
+    |-- 04.QC_dendogram.sh
+    |-- DB_download.sh
+    |-- complement
+    `-- scripts
+    
+ ```
 
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
 ```
