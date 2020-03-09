@@ -1,74 +1,39 @@
 ## Tutorial para la ejecución del Pipeline TumorSec
 
-A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```, la cual, se encuentra como un repositorio privado en el servidor Docker Hub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto. (paso 1)
-
-Ademas, se deben descargar las bases de datos de entrada necesarias para ejecutar el software ANNOVAR, el cual, las utiliza para la anotación funcional de las variantes. Ademas, las bases de datos hg19 y dbsnp_138 necesarias en el pre-procesamiento de datos. La ruta local de descarga de las bases de dato se debe agregar al archivo de configuración de TumorSec (paso 2 y 4)
-
-Una vez descargadas las bases de datos y la imagen docker, se debe ejecutar la imagen de docker de manera interactiva (parámetro -ti en docker run) y montar la cuenta de TumorSec dentro de del contenedor creado, de esta manera podemos acceder a los datos de BaseSpace, necesarios para el demultiplezado de datos y la generación de reportes (paso 3). Luego de estas configuraciones, podemos ejecutar el pipeline de Tumorsec. (paso 5)
+A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. Esta, se encuentra en un repositorio privado en el servidor Docker Hub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto.
 
 Para ejecutar este pipeline se asume instalado el programa docker de manera local en el servidor. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker```. En el servidor Genoma3 de Genomedlab el programa docker con la cual fue testeado este tutorial es la version 18.06.0-ce.
 
-### 1. Configuración de usuario.
+### 1. Pre-configuración.
 
-Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesario que el usuario tenga los permisos para ejecutar docker. Para esto, el administrador(a) del sistema (o un usuario con permisos root) debe se debe agregar al usuario al grupo docker del host.  En caso de no existir grupo docker, este tambien debe ser creado. 
+Para ejecutar TumorSec utilizando la imagen del docker, es necearios realizar configuraciones previas a la ejecución del pipeline. Estas solo se deben ejecutar una vez. En caso de volver a ejecutar el docker de TumorSec, solo se deben seguir las instruciones del punto 2.
 
+#### 1.1. Configuración de usuario.
+
+Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesario que el usuario tenga los permisos para ejecutar docker. Para esto, el administrador(a) de sistema debe agregar al usuario al grupo docker del host.  En caso de no existir grupo docker, este debe ser creado. 
 ```
 groupadd --system docker
-sudo usermod -aG docker TestDockerTumorSec
+sudo usermod -aG docker $USER
 ```
-Para verificar que el usuario puede ejecutar docker.
-```
-docker image ls 
+Siendo $USER el nombre de usuario. Para verificar que el usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
 
-REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 f51393d2badf        4 days ago          9.16GB
-centos                         7                   5e35e350aded        3 months ago        203MB
+#### 1.2. Descargar imagen docker Tumorsec
 
-```
-En caso de arrojar error, reinicie el servicio docker.
+La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta imagen se encuentra en la nube en repositorio privado de DockerHub. Procedemos a descargarl la imagen.
 
-
-### 2. Descargar imagen docker Tumorsec
-
-El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
-
-- Cuenta: tumorsec@gmail.com
-- Contraseña:UDT-seq#19
-
-El contexto para construir la imagen de docker para el pipeline TumorSec, se encuentra en la siguiente ruta
-```/home/egonzalez/workSpace/docker_PipelineTumorsec``` 
-
-En caso de querer realizar algún cambio al pipeline es necesario volver a crear la imagen docker, para esto ejecutar ```docker build``` dentro de la carpea del contexto, donde ademas se realizaron los cambios. Docker cargará los nuevos cambios a la nueva imagen. Para esto, ejecutar:
-
-```
-cd /home/egonzalez/workSpace/docker_PipelineTumorsec
-docker build -t labgenomicatumorsec/tumorsec:0.1 .
-```
-Para verificar que se creó la nueva imagen:
-
+Primero verificamos que la imagen TumorSec no se encuentra en el sistema. Si se encuetra en la lista desplegada, podemos omitir este paso.
 ```
 docker images
-
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 5ea88887915c        27 hours ago        8.05GB
-
+centos                         7                   5e35e350aded        3 months ago        203MB
 ```
-Una vez terminados los cambios de la imagen, se debe actualizar la imagen del repositorio en DockerHub. Se debe ingrear la informacion de usuario y hacer un push al repositorio:
+Ejecutamos las siguientes instrucciones para la descarga.
 
 ```
 docker login docker.io
 Username: tumorsec@gmail.com
 Password: UDT-seq#19
 
-docker push labgenomicatumorsec/tumorsec:0.1
-
-```
-
-Para un segundo cambio, no es necesario ingresar nuevamente el usuario y contraseña.
-En caso de no querer realizar cambios en la imagen se puede utilizar directamente la imagen del repositorio, utlizando ```docker pull``` y la información de la imagen.
-
-Para descargar la imagen de docker desde dockerHub, ejecutar: 
-```
 docker pull labgenomicatumorsec/tumorsec:0.1
 ```
 Para verificar que se descargó la imagen:
@@ -76,12 +41,11 @@ Para verificar que se descargó la imagen:
 docker images
 
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 5ea88887915c        27 hours ago        8.05GB
+labgenomicatumorsec/tumorsec   0.1                 b71f244458dd        32 minutes ago      10.3GB
 
 ```
-Una vez descargada, podemos comenzar a descargar las bases de datos necesarioas para TumorSec.
 
-### 3. Descargar bases de datos de ANNOVAR y hg19
+#### 1.3 Descargar bases de datos de ANNOVAR y hg19
 
 Como parte de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` se agregó un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/Docker/TumorSec ``` de la imagen de docker. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
 
@@ -121,7 +85,7 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 - Hg19
 - dbsnp_138
 
-### 4 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
+#### 4 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
 
 Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, logo del laboratorio ademas los script que conforman el pipeline TumorSec. Para que estos datos sea vizualizados por otros container de docker, es necesario crear un volumen que será utilizado para montar los datos que se encuentran en la image, de esta manera otros docker 'container', podran vizualizarlos. El en llamado de variantes Somaticseq ejecuta los containers de Vardict, Mutect1, Varscan y Lofreq dentro de ```labgenomicatumorsec/tumorsec:0.1```. Para que estos container vizualicen los datos de la imagen, se deden seguir las siguientes instrucciones. 
 
@@ -186,9 +150,9 @@ docker/
     
  ```
 
-### 5. Montar datos de BaseSpace en Docker
+#### 1.5. Montar datos de BaseSpace en Docker
 
-Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace en la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
+Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace dentro de la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
 
 Se debe estar dentro de un contenedor creado a partir de la imagen, si no es así, ejecutar el siguiente comando:
 ```
@@ -239,12 +203,9 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 [root@2efef00d36c2 Tumorsec20200122]#
 
 ```
-
 Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec. Ojo: Hasta el momento cada vez que se corre ```docker run```, se debe montar la carpeta de baseSpace (ejecutar paso 2). Existe una manera de realizar cambios al ejecutar la imagen docker (crear un contenedor) y guardar este contenedor con docker push en DockerHub, sin embargo, todavia no se encuentra implementado.  
 
-
-
-### 5. Configurar archivo con parametros de entrada
+#### 1.5 Configurar archivo con parametros de entrada
 
 Una vez montado el directorio de BaseSpace, es necesario proceder a configurar los parámetros de entrada para la ejecucion del pipeline. Para esto, se creó en la imagen TumorSec un archivo ```00.conf_docker.ini ``` en la carpeta ```/Docker/TumorSec ``` el cual será cargado al inicio de la ejecución del pipeline. Este archivo contiene los parámetros que se pueden modificar. Aquellos que no son modificables se encuentran en el archivo ```00.inputs_TumorSec.ini```, el cual no debe ser alterado.
 
@@ -289,8 +250,7 @@ DP="250" ## profundidad por SNV identificada.
 ```
 Una vez configurado los parámetros de entrada necesarios. Se puede ejecutar el pipeline de TumorSec.(paso 5)
 
-### 6. Ejecución del Pipeline
-
+#### 1.6 Ejecución del Pipeline
 Para la ejecución del pipeline, una vez terminados los pasos anteriores, podemos correr el pipeline dentro del contenedor que configuramos, solo debemos ejecutar el programa ```01.Run_TumorSec.sh```
 
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
@@ -348,5 +308,20 @@ Actualmente existen problemas para ejecutar el llamado de variantes, este proces
 
 El problema actual, es que el docker-in-docker no esta montando los datos que se encuentran dentro de la imagen de TumorSec ```labgenomicatumorsec/tumorsec:0.1```. Por ejemplo, la base de datos COSMIC que no se descarga en el paso 2, si no, que se encuentra integrada en al imagen no puede ser leída al correr MuTect2 (que es un docker que se ejecuta dentro del docker TumorSec). 
 
-### 7. Archivos de salida e interpretación de resultados. 
+### 3. Contrucción de imagen docker 
+
+El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
+
+- Cuenta: tumorsec@gmail.com        
+- Contraseña:UDT-seq#19
+
+El contexto para construir la imagen de docker para el pipeline TumorSec, se encuentra en la siguiente ruta
+```/home/egonzalez/workSpace/docker_PipelineTumorsec```
+
+```
+cd /home/egonzalez/workSpace/docker_PipelineTumorsec
+docker build -t labgenomicatumorsec/tumorsec:0.1 .
+```
+
+#### 4. Archivos de salida e interpretación de resultados. 
 
