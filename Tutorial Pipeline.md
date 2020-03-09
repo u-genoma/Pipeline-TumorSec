@@ -88,7 +88,13 @@ Como parte de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` se agre
 Para ejecutar este script, se debe correr la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run). Para esto, ejecutar el siguiente comando:
 
 ```
-docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --rm \ 
+-v datatumorsec:/docker \ 
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v /usr/bin/docker:/usr/bin/docker \
+--mount type=bind,source=/home/egonzalez/,target=/mnt/home/egonzalez/,bind-propagation=rslave \
+--mount type=bind,source=/home/egonzalez/DB_TumorSec,target=/mnt/home/egonzalez/DB_TumorSec,bind-propagation=rslave \
+labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
 Al ingresar podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta donde serán almacenadas de manera local las bases de datos, antecedido de ```/mnt/```. A contiuación se observa un ejemplo:
 
