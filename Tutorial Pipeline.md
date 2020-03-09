@@ -1,22 +1,24 @@
 ## Tutorial para la ejecución del Pipeline TumorSec
 
-A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. Esta, se encuentra en un repositorio privado en el servidor DockerHub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto.
+A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. La cual, se encuentra en un repositorio privado en el servidor DockerHub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto.
 
-Para ejecutar este pipeline se asume instalado el programa docker de manera local en el servidor. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker```. En el servidor Genoma3 de Genomedlab el programa docker con la cual fue testeado este tutorial es la version 18.06.0-ce.
+Para ejecutar este pipeline se asume instalado el programa docker de manera local en host. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker```. Este tutorial fue testeado con docker v18.06.0-ce en el servidor Genoma3 del laboratorio Genomed. Facultad de medicina, Universidad de Chile.
 
 ### 1. Pre-configuración.
 
-Para ejecutar TumorSec utilizando la imagen del docker, es necearios realizar configuraciones previas a la ejecución del pipeline. Estas solo se deben ejecutar una vez. En caso de volver a ejecutar el docker de TumorSec, solo se deben seguir las instruciones del punto 2.
+Para ejecutar paquete bioinformático TumorSec utilizando docker, es necearios realizar configuraciones previas a la ejecución del pipeline. Estas solo se deben ejecutar una vez. En caso de volver a correr el docker TumorSec, solo se deben seguir las instruciones del punto 2.
 
 #### 1.1. Configuración de usuario.
 
-Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesario que el usuario tenga los permisos para ejecutar docker. Para esto, el administrador(a) de sistema debe agregar al usuario al grupo docker del host.  En caso de no existir grupo docker, este debe ser creado. 
+Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesario que el usuario tenga los permisos para ejecutar docker. Para esto, el administrador(a) de sistema debe agregar al usuario al grupo docker del host.  En caso de no existir el grupo docker, debe ser creado. 
 ```
 groupadd --system docker
 sudo usermod -aG docker $USER
 ```
-Siendo ```$USER``` el nombre de usuario. Para verificar que el usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
-
+Siendo ```$USER``` el nombre de usuario. Para verificar los permisos de usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
+```
+sudo systemctl restart docker
+```
 #### 1.2. Descargar imagen docker Tumorsec
 
 La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta se encuentra en la nube en repositorio privado de DockerHub. Procedemos a descargar la imagen.
