@@ -25,7 +25,7 @@ La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sis
 
 Primero verificamos que la imagen TumorSec no se encuentra en el sistema. Si se encuetra en la lista desplegada, podemos omitir este paso.
 ```
-docker images
+docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
 centos                         7                   5e35e350aded        3 months ago        203MB
 ```
@@ -39,14 +39,11 @@ docker pull labgenomicatumorsec/tumorsec:0.1
 ```
 Para verificar que se descargó la imagen:
 ```
-docker images
-
+docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
 labgenomicatumorsec/tumorsec   0.1                 b71f244458dd        32 minutes ago      10.3GB
-
 ```
-
-#### 1.3 Descargar bases de datos de ANNOVAR y hg19
+#### 1.3 Descargar bases de datos externas
 
 En la imagen de TumorSec ```labgenomicatumorsec/tumorsec:0.1``` hay un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/Docker/TumorSec ``` de la imagen de docker. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
 
@@ -84,7 +81,7 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 - Hg19
 - dbsnp_138
 
-#### 4 . Crear volumen para los datos dentro de la imagen ```labgenomicatumorsec/tumorsec:0.1```
+#### 1.4 Crear volumen para datos internos en la imagen
 
 Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la image, de esta manera otros contenedores podrán vizualizarlos.
 
@@ -101,7 +98,64 @@ local               datatumorsec
 ```
 Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de ejecutar el docker ```docker run``` (Sección 2)
 
-#### 1.5. Montar datos de BaseSpace en Docker
+### 2. Ejecutar pipeline TumorSec.
+
+A continuación se lista los pasos necesarios para correr el pipeline de TumorSec para una corrida en particular. Cada vez que existe una nueva corrida de TumorSec, se deben seguir las siguientes instrucciones. Se asume que las pre-configuraciones ya se encuentran en el host. (Sección 1)
+
+#### 2.1 Crear un contenedor de TumorSec.
+
+Creamos un contenedor de TumorSec, ejecutando ```docker run```.
+```
+docker run --privileged -ti -d \
+-v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock \
+-v /usr/bin/docker:/usr/bin/docker \
+--mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave \
+--mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave \
+labgenomicatumorsec/tumorsec:0.1 /bin/bash
+```
+- ```docker run``` : Crea un contenedor docker
+- ```--privileged``` : Da permisos root dentro del contenedor.
+- ```-ti``` : Permite crear un contenedor interactivo.
+- ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
+- ```-v datatumorsec:/docker``` : Monta el directorio /docker de la imagen en el volumen datatumorsec
+- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor
+- ```-v /usr/bin/docker:/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor
+- ```--mount type=bind,source=/,target=/mnt,bind-propagation=rslave```: Monta los datos del directorio raíz del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos.
+- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de DockerHub 
+- ```/bin/bash```: El container ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
+
+Una vez ejecutado el comando anterior podemos vizualizar los datos montados en ```datatumorsec```, datos que son propios de la imagen TumorSec.
+
+```
+[root@9aa37fe30960 /]# tree -L 2 docker/
+docker/
+|-- BaseSpace
+|-- Inputs_TumorSec
+|   |-- MiSeq_ReagentKitV2.csv
+|   |-- genome
+|   |-- logo_lab.png
+|   `-- targets
+|-- programas
+|   |-- GenomeAnalysisTK.jar
+|   |-- annovar
+|   |-- fastp
+|   |-- picard.jar
+|   `-- somaticseq
+`-- tumorSec
+    |-- 00.conf_docker.ini
+    |-- 00.inputs_TumorSec.ini
+    |-- 01.Run_TumorSec.sh
+    |-- 02.QC_Reports.sh
+    |-- 03.Variants_reports.sh
+    |-- 04.QC_dendogram.sh
+    |-- DB_download.sh
+    |-- complement
+    `-- scripts
+    
+ ```
+Como buena practica, podemos vizualizar los contenedores del sistema con ```docker ps -a``` para evitar el exceso de contenedores, podemos elimnarlos con el comando ```docker rm ID_container```
+
+#### 2.1 Montar datos de BaseSpace contenedor.
 
 Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace dentro de la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
 
@@ -156,7 +210,7 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 ```
 Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec. Ojo: Hasta el momento cada vez que se corre ```docker run```, se debe montar la carpeta de baseSpace (ejecutar paso 2). Existe una manera de realizar cambios al ejecutar la imagen docker (crear un contenedor) y guardar este contenedor con docker push en DockerHub, sin embargo, todavia no se encuentra implementado.  
 
-#### 1.5 Configurar archivo con parametros de entrada
+#### 1.5 Configurar archivo con parámetros de entrada
 
 Una vez montado el directorio de BaseSpace, es necesario proceder a configurar los parámetros de entrada para la ejecucion del pipeline. Para esto, se creó en la imagen TumorSec un archivo ```00.conf_docker.ini ``` en la carpeta ```/Docker/TumorSec ``` el cual será cargado al inicio de la ejecución del pipeline. Este archivo contiene los parámetros que se pueden modificar. Aquellos que no son modificables se encuentran en el archivo ```00.inputs_TumorSec.ini```, el cual no debe ser alterado.
 
@@ -201,55 +255,7 @@ DP="250" ## profundidad por SNV identificada.
 ```
 Una vez configurado los parámetros de entrada necesarios. Se puede ejecutar el pipeline de TumorSec.(paso 5)
 
-#### 1.6 Ejecución del Pipeline
-Para la ejecución del pipeline, una vez terminados los pasos anteriores, podemos correr el pipeline dentro del contenedor que configuramos, solo debemos ejecutar el programa ```01.Run_TumorSec.sh```
-
-Ejecutar el docker.
-
-```
-docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
-```
-- ```docker run``` : Crea un contenedor docker
-- ```--privileged``` : Da permisos root dentro del contenedor.
-- ```-ti``` : Permite crear un contenedor interactivo.
-- ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
-- ```-v datatumorsec:/docker``` : Monta el directorio /docker de la imagen en el volumen datatumorsec
-- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor
-- ```-v /usr/bin/docker:/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor
-- ```--mount type=bind,source=/,target=/mnt,bind-propagation=rslave```: Monta los datos del directorio raíz del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos.
-- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de DockerHub 
-- ```/bin/bash```: El container ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
-
-Una vez ejecutado el comando anterior podemos vizualizar los datos montados en ```datatumorsec```, datos que son propios de la imagen TumorSec.
-
-```
-[root@9aa37fe30960 /]# tree -L 2 docker/
-docker/
-|-- BaseSpace
-|-- Inputs_TumorSec
-|   |-- MiSeq_ReagentKitV2.csv
-|   |-- genome
-|   |-- logo_lab.png
-|   `-- targets
-|-- programas
-|   |-- GenomeAnalysisTK.jar
-|   |-- annovar
-|   |-- fastp
-|   |-- picard.jar
-|   `-- somaticseq
-`-- tumorSec
-    |-- 00.conf_docker.ini
-    |-- 00.inputs_TumorSec.ini
-    |-- 01.Run_TumorSec.sh
-    |-- 02.QC_Reports.sh
-    |-- 03.Variants_reports.sh
-    |-- 04.QC_dendogram.sh
-    |-- DB_download.sh
-    |-- complement
-    `-- scripts
-    
- ```
-
+#### 2.4 Correr pipeline. 
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
 ```
 [root@201792d839be /]# cd Docker/
