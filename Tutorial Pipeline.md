@@ -1,6 +1,6 @@
 ## Tutorial para la ejecución del Pipeline TumorSec
 
-A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. Esta, se encuentra en un repositorio privado en el servidor Docker Hub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto.
+A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. Esta, se encuentra en un repositorio privado en el servidor DockerHub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto.
 
 Para ejecutar este pipeline se asume instalado el programa docker de manera local en el servidor. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker```. En el servidor Genoma3 de Genomedlab el programa docker con la cual fue testeado este tutorial es la version 18.06.0-ce.
 
@@ -15,11 +15,11 @@ Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesa
 groupadd --system docker
 sudo usermod -aG docker $USER
 ```
-Siendo $USER el nombre de usuario. Para verificar que el usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
+Siendo ```$USER``` el nombre de usuario. Para verificar que el usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
 
 #### 1.2. Descargar imagen docker Tumorsec
 
-La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta imagen se encuentra en la nube en repositorio privado de DockerHub. Procedemos a descargarl la imagen.
+La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta se encuentra en la nube en repositorio privado de DockerHub. Procedemos a descargar la imagen.
 
 Primero verificamos que la imagen TumorSec no se encuentra en el sistema. Si se encuetra en la lista desplegada, podemos omitir este paso.
 ```
@@ -28,7 +28,6 @@ REPOSITORY                     TAG                 IMAGE ID            CREATED  
 centos                         7                   5e35e350aded        3 months ago        203MB
 ```
 Ejecutamos las siguientes instrucciones para la descarga.
-
 ```
 docker login docker.io
 Username: tumorsec@gmail.com
@@ -47,25 +46,22 @@ labgenomicatumorsec/tumorsec   0.1                 b71f244458dd        32 minute
 
 #### 1.3 Descargar bases de datos de ANNOVAR y hg19
 
-Como parte de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` se agregó un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/Docker/TumorSec ``` de la imagen de docker. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
+En la imagen de TumorSec ```labgenomicatumorsec/tumorsec:0.1``` hay un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/Docker/TumorSec ``` de la imagen de docker. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
 
 Para ejecutar este script, se debe correr la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run). Para esto, ejecutar el siguiente comando:
-
 ```
 docker run --privileged -ti --rm \ 
--v datatumorsec:/docker \ 
--v /var/run/docker.sock:/var/run/docker.sock \
--v /usr/bin/docker:/usr/bin/docker \
---mount type=bind,source=/home/egonzalez/,target=/mnt/home/egonzalez/,bind-propagation=rslave \
---mount type=bind,source=/home/egonzalez/DB_TumorSec,target=/mnt/home/egonzalez/DB_TumorSec,bind-propagation=rslave \
+--mount type=bind,source=/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave \
 labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-Al ingresar podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta donde serán almacenadas de manera local las bases de datos, antecedido de ```/mnt/```. A contiuación se observa un ejemplo:
+Siendo ```/output_DB```el directorio de salida donde se descargarán las bases de datos en el host. Dentro de la imagen Docker, este directorio será ```/mnt/docker/DB_TumorSec```, el cual debe ser el parámetro de entrada para el script ``` DB_download.sh```.
+
+Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/Docker/TumorSec ```podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta donde serán almacenadas las bases de datos. A contiuación se observa un ejemplo:
 
 ```
 sh DB_download.sh
 Enter the output directory:
-/mnt/home/egonzalez/DB_TumorSec
+/mnt/docker/DB_TumorSec
 ```
 Bases de datos descargadas para ANNOVAR
 - refGene
