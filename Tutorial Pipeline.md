@@ -53,10 +53,10 @@ En la imagen de TumorSec ```labgenomicatumorsec/tumorsec:0.1``` hay un script en
 Para ejecutar este script, se debe correr la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run). Para esto, ejecutar el siguiente comando:
 ```
 docker run --privileged -ti --rm \ 
---mount type=bind,source=/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave \
+--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave \
 labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-Siendo ```/output_DB```el directorio de salida donde se descargarán las bases de datos en el host. Dentro de la imagen Docker, este directorio será ```/mnt/docker/DB_TumorSec```, el cual debe ser el parámetro de entrada para el script ``` DB_download.sh```.
+Siendo ```/path/to/output_DB```el directorio de salida donde se descargarán las bases de datos en el host. Dentro de la imagen Docker, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```.
 
 Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/Docker/TumorSec ```podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta donde serán almacenadas las bases de datos. A contiuación se observa un ejemplo:
 
@@ -65,6 +65,8 @@ sh DB_download.sh
 Enter the output directory:
 /mnt/docker/DB_TumorSec
 ```
+*La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuracion por defecto, por tanto, no debe modificarse.
+
 Bases de datos descargadas para ANNOVAR
 - refGene
 - AFR.sites.2015_08
