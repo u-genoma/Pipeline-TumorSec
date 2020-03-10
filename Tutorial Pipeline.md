@@ -162,16 +162,16 @@ Opcional: podemos vizualizar los contenedores del sistema con ```docker ps -a```
 
 #### 2.1 Montar datos de BaseSpace contenedor.
 
-Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace dentro de la imagen docker. La corrida de secuenciación debe estar compartida en la cuenta de TumorSec en [BaseSpace Illumina](https://basespace.illumina.com/), de esta manera podemos montar los datos en el contenedor previamente creado.
+Para ejecutar el pipeline de TumorSec es necesario montar los datos de BaseSpace dentro del contenedor previamente creado. La corrida de secuenciación debe estar compartida en la cuenta de TumorSec de [BaseSpace Illumina](https://basespace.illumina.com/).
 
 Para montar los datos se deben seguir las siguientes instrucciones: 
  - Ingresa a la carpeta docker del contenedor: ```cd /docker/```
- - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/
- - Copiar link desplegado en navegador e ingresar datos de la cuenta de TumorSec.
+ - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```
+ - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de TumorSec.
  - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /docker/BaseSpace/Runs/Nombre_Secuencion_Nueva```
  - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.
 
-A continuación se observa un ejemplo de los pasos anteriores.
+A continuación se observa un ejemplo:
 ```
 cd /docker
 basemount BaseSpace/
@@ -197,9 +197,7 @@ You need to authenticate by opening this URL in a browser:
 Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec. 
 - Usuario:tumorsec@gmail.com
 - Contraseña: UDT-seq#19
-
 Ahora podemos observar las corridas de TumorSec que fueron compartidas a la cuenta tumorsec@gmail.com
-
 ```
 [root@2efef00d36c2 Docker]# cd BaseSpace/
 [root@2efef00d36c2 BaseSpace]# ls
@@ -214,23 +212,23 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 [root@2efef00d36c2 Tumorsec20200122]#
 
 ```
-Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec.
+Con la ruta de BaseSapce de la corrida (ej: ```/Docker/BaseSpace/Runs/Tumorsec20200122```) podemos correr el pipeline de tumorSec.
 
-#### 1.5 Configurar archivo con parámetros de entrada
+#### 1.5 Opcional: Configurar archivo con parámetros de entrada
 
-Una vez montado el directorio de BaseSpace, es necesario proceder a configurar los parámetros de entrada para la ejecucion del pipeline. Para esto, se creó en la imagen TumorSec un archivo ```00.conf_docker.ini ``` en la carpeta ```/Docker/TumorSec ``` el cual será cargado al inicio de la ejecución del pipeline. Este archivo contiene los parámetros que se pueden modificar. Aquellos que no son modificables se encuentran en el archivo ```00.inputs_TumorSec.ini```, el cual no debe ser alterado.
+Es posible cambiar los parámetros de entrada para la ejecucion del pipeline, en caso de no querer los parametros por defecto. Para esto, se creó en la imagen TumorSec el archivo ```00.conf_docker.ini ``` en la carpeta ```/docker/tumorSec ``` el cual será cargado al inicio de la ejecución del pipeline. Este archivo contiene los parámetros que se pueden modificar, el resto de los parámetros que no son modificables se encuentran en el archivo ```00.inputs_TumorSec.ini```.
 
-archivo: ```00.conf_docker.ini```
+En el archivo: ```00.conf_docker.ini``` podemos modificar todos los parametros, sin embargo, no es necesario para el ejecución del pipeline.
 
-EXT_DBS -> variable con la ruta absoluta de las bases de datos descargadas hg19 y dbsnp (paso2)
-ANNOVAR_HDB -> variable con la ruta absoluta de las bases de datos descargadas de annovar (paso2)
+EXT_DBS: variable con la ruta absoluta de las bases de datos descargadas hg19 y dbsnp (Sección 1.3)
+ANNOVAR_HDB: variable con la ruta absoluta de las bases de datos descargadas de annovar (Sección 1.3)
 
 Para modificar el archivo de cofiguracion:
-
 ```
+cd /docker/tumorSec
 nano 00.conf_docker.ini
 ```
-
+Podemos vizualizar los parametros y la descripcion de estos en el archivo.
 ```
 #########
 # Pipeline TumorSec V2.0 
@@ -239,9 +237,9 @@ nano 00.conf_docker.ini
 # se creo este archivo, que solo tiene los parámetros modificables en el pipeline. 
 ########
 
-## Ingresar la ruta donde se descargaron las bases de datos. (paso 2)
-EXT_DBS="/mnt/home/egonzalez/Inputs_TumorSec/genome"    ## hg19 y dbsnp_138
-ANNOVAR_HDB="/mnt/datos/reference/annot/annovar/humandb"  ## bases de datos de annovar
+## Ingresar la ruta donde se descargaron las bases de datos. (Seccion 1.3)
+EXT_DBS="/mnt/docker/DB_TumorSec"    ## hg19 y dbsnp_138
+ANNOVAR_HDB="/mnt/docker/DB_TumorSec"  ## bases de datos de annovar
 
 ## PARAMETERS OF TRIMMING (FASTP)
 qual="20"
@@ -253,15 +251,17 @@ AF="0.02"
 ExAC="0.01"
 DP_ALT="12"
 
-## DEFAULTS PARAMETERS DENDOGRAM
+## DEFAULTS DENDOGRAM PARAMETERS 
 PCT_GT_SNV="0.9" ### porcentaje de genotipado del 90% por SNV (RSID).
 PCT_GT_SAMPLES="0.5" ### porcentaje de genotipado por 50% por muestra. 
 MAF="0.05" ## Mínimo de frecuencia alélica del 5% para cada RSID.
 DP="250" ## profundidad por SNV identificada.
 ```
-Una vez configurado los parámetros de entrada necesarios. Se puede ejecutar el pipeline de TumorSec.(paso 5)
+Al cerrar el archivo, se deben guardar los cambios y poceder a ejecutar el pipeline de TumorSec en el actual contenedor.
 
 #### 2.4 Correr pipeline. 
+
+Una vez configurado los parámetros de entrada necesarios
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
 ```
 [root@201792d839be /]# cd Docker/
@@ -313,9 +313,6 @@ Comando: sh /Docker/TumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - start - demultiplexing
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/0_logs/0_log_demultiplexing.out
 ```
-Actualmente existen problemas para ejecutar el llamado de variantes, este proceso, debe ejecutar 5 imagenes de docker dentro del docker. Se logró ejecutar el docker-in-docker estableciendo un link del programa docker de manera local a la imagen y montando el binario en ```docker run```con los parámetros: ```-v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker```. Para montar los datos de manera recursiva, es decir, para que el docker dentro del docker acceda a los archivos del host, se de debe montar el directorio raíz de manera recursiva con el parámetro ```-mount type=bind,source=/,target=/mnt,bind-propagation=rslave``` en ```docker run ```.
-
-El problema actual, es que el docker-in-docker no esta montando los datos que se encuentran dentro de la imagen de TumorSec ```labgenomicatumorsec/tumorsec:0.1```. Por ejemplo, la base de datos COSMIC que no se descarga en el paso 2, si no, que se encuentra integrada en al imagen no puede ser leída al correr MuTect2 (que es un docker que se ejecuta dentro del docker TumorSec). 
 
 ### 3. Contrucción de imagen docker 
 
