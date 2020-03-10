@@ -54,7 +54,7 @@ docker run --privileged -ti --rm \
 --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave \
 labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-Siendo ```/path/to/output_DB``` el directorio de salida donde se descargarán las bases de datos en el host. Dentro del contenedor , este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh``` (Sección 2.3).
+Siendo ```/path/to/output_DB``` el directorio de salida donde se descargarán las bases de datos en el host. Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh``` (Sección 2.3).
 
 Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/docker/tumorSec ```, podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta donde serán almacenadas las bases de datos. A contiuación se observa un ejemplo:
 ```
@@ -85,7 +85,7 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 
 #### 1.4 Crear volumen para datos internos en la imagen
 
-Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la image, de esta manera otros contenedores podrán vizualizarlos.
+Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la image.
 
 Crear un volumen con el nombre ```datatumorsec```
 ```
@@ -97,7 +97,7 @@ docker volume ls
 DRIVER              VOLUME NAME
 local               datatumorsec
 ```
-Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de ejecutar el docker ```docker run``` (Sección 2)
+Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de crear el contenedor ```docker run``` (Sección 2)
 
 ### 2. Ejecutar pipeline TumorSec.
 
@@ -105,7 +105,7 @@ A continuación se lista los pasos necesarios para correr el pipeline de TumorSe
 
 #### 2.1 Crear un contenedor de TumorSec.
 
-Creamos un contenedor de TumorSec, ejecutando ```docker run```.
+Creamos un contenedor de TumorSec, ejecutando ```docker run```. El cual, desplegará una nueva terminal, con esto verificamos que estamos dentro del contenedor. Cualquier cambio realizado en el contenedor, será eliminado al momento de ser borrado el contenedor, por tanto, cada vez que existe una nueva corrida de secuenciación se debe crear un nuevo contenedor. 
 ```
 docker run --privileged -ti -d \
 -v datatumorsec:/docker \
@@ -115,22 +115,22 @@ docker run --privileged -ti -d \
 --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave \
 labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-Descripcion de los parámetros:
-
-- ```docker run``` : Crea un contenedor docker
+Descripción de los parámetros:
+- ```docker run``` : Crea un contenedor docker.
 - ```--privileged``` : Da permisos root dentro del contenedor.
 - ```-ti``` : Permite crear un contenedor interactivo.
 - ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
-- ```-v datatumorsec:/docker``` : Monta el directorio ```/docker``` de la imagen en el volumen datatumorsec
-- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor
-- ```-v $(which docker):/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor
-- ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave```: Monta los datos del ```home``` del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos. 
-- ```--mount type=bind,source=/path/to/output_DB,target=/mnt/home,bind-propagation=rslave```: Monta los datos del ```home``` del host al nuevo container de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos.
-- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de DockerHub 
-- ```/bin/bash```: El container ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
+- ```-v datatumorsec:/docker``` : Monta el directorio ```/docker``` de la imagen en el volumen ```datatumorsec```
+- ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor.
+- ```-v $(which docker):/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor.
+- ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave```: Monta los datos del ```/home``` del host al nuevo contenedor en ```/mnt/home``` de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos. 
+- ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave```: Monta los datos del ```/path/to/output_DB``` del host al nuevo contenedor en ```/mnt/docker/DB_TumorSec``` de manera recursiva.
+- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de Docker Hub. 
+- ```/bin/bash```: Contenedor ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
 
-Una vez ejecutado el comando anterior podemos vizualizar los datos montados en ```datatumorsec```, datos que son propios de la imagen TumorSec.
+El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta, donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). Ademas, el parámetro ```/home``` en ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave``` debe ser remlplazado si el directorio de salida para la corrida no esta en el ```/home``` del usuario.
 
+Opcional: Una vez ejecutado el comando anterior podemos vizualizar los datos de la imagen: 
 ```
 [root@9aa37fe30960 /]# tree -L 2 docker/
 docker/
