@@ -329,5 +329,8 @@ cd /home/egonzalez/workSpace/docker_PipelineTumorsec
 docker build -t labgenomicatumorsec/tumorsec:0.1 .
 ```
 
+Cada vez que se cree una nueva versión de la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` se debe eliminar el volumen ```datatumorsec```(Sección 1.4) con el comando ```docker volume rm datatumorsec```y crearlo de nuevo ```docker volume create datatumorsec```. De esta manera se podrán ver los cambios realizados en la imagen al momento de crear un nuevo contenedor.
+
+
 #### 4. Archivos de salida e interpretación de resultados. 
 
