@@ -85,7 +85,7 @@ Bases de datos descargadas para el pipeline (GATK, SomaticSeq entre otros)
 
 #### 1.4 Crear volumen para datos internos en la imagen
 
-Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la image.
+Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la imagen.
 
 Crear un volumen con el nombre ```datatumorsec```
 ```
@@ -128,7 +128,7 @@ Descripción de los parámetros:
 - ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de Docker Hub. 
 - ```/bin/bash```: Contenedor ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
 
-El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta, donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). Ademas, el parámetro ```/home``` en ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave``` debe ser remlplazado si el directorio de salida para la corrida no esta en el ```/home``` del usuario.
+El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta en donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). Ademas, el directorio ```/home``` en ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave``` debe ser remplazado, si la salida para la corrida no esta en el ```/home``` del usuario.
 
 Opcional: Una vez ejecutado el comando anterior podemos vizualizar los datos de la imagen: 
 ```
@@ -158,21 +158,22 @@ docker/
     `-- scripts
     
  ```
-Como buena practica, podemos vizualizar los contenedores del sistema con ```docker ps -a``` para evitar el exceso de contenedores, podemos elimnarlos con el comando ```docker rm ID_container```
+Opcional: podemos vizualizar los contenedores del sistema con ```docker ps -a```. Para evitar el exceso de contenedores es posible eliminarlos con el comando ```docker rm ID_container```
 
 #### 2.1 Montar datos de BaseSpace contenedor.
 
-Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace dentro de la imagen docker. Para montar los datos, se debe seguir las siguientes instrucciones. El programa basemount se encuentra instalado en la imagen. 
+Para ejecutar el pipeline de TumorSec, es necesario montar los datos de BaseSpace dentro de la imagen docker. La corrida de secuenciación debe estar compartida en la cuenta de TumorSec en [BaseSpace Illumina](https://basespace.illumina.com/), de esta manera podemos montar los datos en el contenedor previamente creado.
 
-Se debe estar dentro de un contenedor creado a partir de la imagen, si no es así, ejecutar el siguiente comando:
-```
-docker run --privileged -ti --rm -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v /usr/bin/docker:/usr/bin/docker --mount type=bind,source=/,target=/mnt,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
-```
-Luego se debe crear una carpeta BaseSpace y montar los datos:
+Para montar los datos se deben seguir las siguientes instrucciones: 
+ - Ingresa a la carpeta docker del contenedor: ```cd /docker/```
+ - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/
+ - Copiar link desplegado en navegador e ingresar datos de la cuenta de TumorSec.
+ - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /docker/BaseSpace/Runs/Nombre_Secuencion_Nueva```
+ - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.
 
+A continuación se observa un ejemplo de los pasos anteriores.
 ```
-cd /Docker/
-mkdir BaseSpace
+cd /docker
 basemount BaseSpace/
 
 ,-----.                        ,--.   ,--.                         ,--.
@@ -213,7 +214,7 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 [root@2efef00d36c2 Tumorsec20200122]#
 
 ```
-Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec. Ojo: Hasta el momento cada vez que se corre ```docker run```, se debe montar la carpeta de baseSpace (ejecutar paso 2). Existe una manera de realizar cambios al ejecutar la imagen docker (crear un contenedor) y guardar este contenedor con docker push en DockerHub, sin embargo, todavia no se encuentra implementado.  
+Con la ruta de BaseSapce de la corrida, podemos correr el pipeline de tumorSec.
 
 #### 1.5 Configurar archivo con parámetros de entrada
 
