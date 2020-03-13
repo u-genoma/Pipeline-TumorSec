@@ -128,7 +128,7 @@ Descripción de los parámetros:
 - ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de Docker Hub. 
 - ```/bin/bash```: Contenedor ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
 
-El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta en donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). Ademas, el directorio ```/home``` en ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave``` debe ser remplazado, si la salida para la corrida no esta en el ```/home``` del usuario.
+El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta en donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). Ademas, el directorio ```/home``` en ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave``` debe ser remplazado, solo si la salida para la corrida no esta en el ```/home``` del usuario.
 
 Opcional: Una vez ejecutado el comando anterior podemos vizualizar los datos de la imagen: 
 ```
@@ -160,7 +160,9 @@ docker/
  ```
 Opcional: podemos vizualizar los contenedores del sistema con ```docker ps -a```. Para evitar el exceso de contenedores es posible eliminarlos con el comando ```docker rm ID_container```
 
-#### 2.1 Montar datos de BaseSpace contenedor.
+Los pasos posteriores deben ser ejecutados, dentro del contenedor que se acaba de crear. 
+
+#### 2.1 Montar datos de BaseSpace en contenedor.
 
 Para ejecutar el pipeline de TumorSec es necesario montar los datos de BaseSpace dentro del contenedor previamente creado. La corrida de secuenciación debe estar compartida en la cuenta de TumorSec de [BaseSpace Illumina](https://basespace.illumina.com/).
 
@@ -220,8 +222,8 @@ Es posible cambiar los parámetros de entrada para la ejecucion del pipeline, en
 
 En el archivo: ```00.conf_docker.ini``` podemos modificar todos los parametros, sin embargo, no es necesario para el ejecución del pipeline.
 
-EXT_DBS: variable con la ruta absoluta de las bases de datos descargadas hg19 y dbsnp (Sección 1.3)
-ANNOVAR_HDB: variable con la ruta absoluta de las bases de datos descargadas de annovar (Sección 1.3)
+```EXT_DBS```: variable con la ruta absoluta de las bases de datos descargadas hg19 y dbsnp (Sección 1.3)
+```ANNOVAR_HDB```: variable con la ruta absoluta de las bases de datos descargadas de annovar (Sección 1.3)
 
 Para modificar el archivo de cofiguracion:
 ```
@@ -261,8 +263,14 @@ Al cerrar el archivo, se deben guardar los cambios y poceder a ejecutar el pipel
 
 #### 2.4 Correr pipeline. 
 
-Una vez configurado los parámetros de entrada necesarios
+Una vez configurado los parámetros de entrada necesarios podemos ejecutar el pipeline dentro del contenedor: 
+Se debe ejecutar el bash ```01.Run_TumorSec.sh```el cual pedirá la información necesario para la ejecucion. La información previa que debemos tener es: 
+
+ - Ruta del directorio donde serán almacenados los archivos de salida de pipeline. Ej: ```/mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122```
+ - Ruta del directorio de BaseSpace de la corrida. Ej: ```/Docker/BaseSpace/Runs/Tumorsec20200122 ```(Sección 2.1)
+
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
+
 ```
 [root@201792d839be /]# cd Docker/
 [root@201792d839be Docker]# ls
