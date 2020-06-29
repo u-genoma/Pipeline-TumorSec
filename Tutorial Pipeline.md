@@ -32,7 +32,7 @@ centos                         7                   5e35e350aded        3 months 
 Ejecutamos las siguientes instrucciones para la descarga.
 ```
 docker login docker.io
-Username: tumorsec@gmail.com
+Username: labgenomicatumorsec
 Password: UDT-seq#19
 
 docker pull labgenomicatumorsec/tumorsec:0.1
