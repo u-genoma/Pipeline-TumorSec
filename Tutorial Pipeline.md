@@ -56,7 +56,7 @@ labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
 Donde ```/path/to/output_DB``` es el único parámetro que se debe modificar, corresponde al directorio donde se descargarán las bases de datos en el host. Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```.
 
-Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/docker/tumorSec ```, podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ``` DB_download.sh``` e ingresar la ruta ```/mnt/docker/DB_TumorSec``` donde serán almacenadas las bases de datos. A contiuación se observa un ejemplo:
+Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/docker/tumorSec```, podemos observar con ```ls``` que se encuentran los scripts necesarios para correr TurmorSec. Ejecutar el script ```DB_download.sh``` e ingresar la ruta ```/mnt/docker/DB_TumorSec``` donde serán almacenadas las bases de datos. A contiuación se observa un ejemplo:
 
 ```
 cd /docker/tumorSec
@@ -66,7 +66,7 @@ Enter the output directory:
 ```
 La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, no es un parámetro modificable. Se comenzarán de descargar las bases de datos. Para poder cerrar la consola (sin matar el proceso de descarga), la forma predeterminada de desconectarse de un contenedor interactivo es ```Ctrl + P Ctrl + Q```.
 
-Fuera del contenedor creando (DBs), ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o en "stop". El la lista se debe encontrar el contenedor recientemente creado. Para ingregar al contenedor, ejecutar ```docker container attach ID_container``` y para desconectarse ```Ctrl + P Ctrl + Q```
+Fuera del contenedor creando (DBs), ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o en "stop". En la lista se encontrará el contenedor recientemente creado. Para ingregar al contenedor, ejecutar ```docker container attach ID_container``` y para desconectarse ```Ctrl + P Ctrl + Q```
 
 #### 1.4 Crear volumen para datos internos en la imagen
 
