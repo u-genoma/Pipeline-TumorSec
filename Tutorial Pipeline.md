@@ -27,7 +27,7 @@ Primero verificamos que la imagen TumorSec no se encuentra en el sistema. Si se 
 ```
 docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-centos                         7                   5e35e350aded        3 months ago        203MB
+centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
 Ejecutamos las siguientes instrucciones para la descarga.
 ```
@@ -41,8 +41,8 @@ Para verificar que se descargó la imagen:
 ```
 docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 b71f244458dd        32 minutes ago      10.3GB
-centos                         7                   5e35e350aded        3 months ago        203MB
+labgenomicatumorsec/tumorsec   0.1                 2334cbb496ef        13 hours ago        9.04GB
+centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
 #### 1.3 Descargar bases de datos externas
 
