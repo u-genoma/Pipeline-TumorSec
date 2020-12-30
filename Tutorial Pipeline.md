@@ -2,11 +2,11 @@
 
 A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. Esta, se encuentra en un repositorio privado en el servidor DockerHub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto.
 
-Para ejecutar este pipeline se asume instalado el programa docker de manera local en host. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker``` en Sistemas operativos Centos. Este tutorial fue testeado con ```docker v18.06.0-ce``` en el servidor Genoma3 del laboratorio Genomed. Facultad de medicina, Universidad de Chile.
+Para ejecutar este pipeline se asume instalado el programa docker de manera local en host. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker``` en sistema operativo Centos. Este tutorial fue testeado con ```docker v18.06.0-ce``` en el servidor Genoma3 del laboratorio Genomed, Facultad de medicina, Universidad de Chile.
 
 ### 1. Pre-configuración.
 
-Para ejecutar el paquete bioinformático TumorSec utilizando docker, es necearios realizar configuraciones previas a la ejecución del pipeline. Estas solo se deben ejecutar una vez, en caso de volver a correr el docker TumorSec, solo se deben seguir las instruciones del punto 2.
+Para ejecutar el paquete bioinformático TumorSec utilizando docker, es necesario realizar configuraciones previas a la ejecución del pipeline. Estas son: (1.1) configuración de usuario, (1.2)descargar imagen docker Tumorsec , (1.3) descargar bases de datos externas y (1.4) crear volumen para datos internos en la imagen. Estas solo se deben ejecutar una vez, en caso de volver a correr el docker TumorSec solo se deben seguir las instruciones del punto 2.
 
 #### 1.1. Configuración de usuario.
 
