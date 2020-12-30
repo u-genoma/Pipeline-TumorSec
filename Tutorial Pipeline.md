@@ -66,7 +66,12 @@ Enter the output directory:
 ```
 La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, no es un parámetro modificable. Se comenzarán a descargar las bases de datos. Para poder cerrar la consola (sin matar el proceso de descarga), la forma predeterminada de desconectarse de un contenedor interactivo es ```Ctrl + P Ctrl + Q```.
 
-Fuera del contenedor creando (DBs), ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o en "stop". En la lista se encontrará el contenedor recientemente creado. Para ingregar al contenedor, ejecutar ```docker container attach DBs``` y para desconectarse ```Ctrl + P Ctrl + Q```
+Fuera del contenedor creando (DBs), ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o en "stop". En la lista se encontrará el contenedor recientemente creado. Para ingregar al contenedor, ejecutar ```docker container attach CONTAINER_NAME``` y para desconectarse ```Ctrl + P Ctrl + Q```
+
+Datos:
+Comando para listar contenedores: ```docker ps -a```
+Comando para detener un contenedor: ```docker stop CONTAINER_NAME```
+Comando para eliminar un contenedor: ```docker rm CONTAINER_NAME```
 
 #### 1.4 Crear volumen para datos internos en la imagen
 
