@@ -15,7 +15,7 @@ Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesa
 groupadd --system docker
 sudo usermod -aG docker $USER
 ```
-Siendo ```$USER``` el nombre de usuario. Para verificar los permisos de usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
+Donde ```$USER``` es el nombre de usuario. Para verificar los permisos de usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
 ```
 sudo systemctl restart docker
 ```
