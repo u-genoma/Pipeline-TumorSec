@@ -73,6 +73,13 @@ Fuera del contenedor creado, ejecutamos ```docker ps -a``` para listar los conte
 
 En caso de haber algun problema con la descarga, se debe detener el contenedor (```docker stop CONTAINER_NAME```) y eliminarlo (```docker rm  CONTAINER_NAME```). Luego se debe ejecutarse nuevamente el comando ```docker run...``` descrito anteriormente.
 
+Finalmente, cuando se termine la descarga. Se desplegará el siguiente mensaje por pantalla.
+```
+*********************
+*** DONE-TumorSec ***
+*********************
+ ```
+
 #### 1.4 Crear volumen para datos internos en la imagen
 
 Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la imagen.
@@ -88,7 +95,7 @@ DRIVER              VOLUME NAME
 local               datatumorsec
 ```
 Una vez creado el volumen, este será utilizado para montar el directorio ```/docker``` que se encuentra en la imagen. Esto se debe realizar a momento de crear el contenedor ```docker run``` (Sección 2)
-
+ 
 ### 2. Ejecutar pipeline TumorSec.
 
 A continuación se lista los pasos necesarios para correr el pipeline de TumorSec para una corrida en particular. Cada vez que existe una nueva corrida de TumorSec, se deben seguir las siguientes instrucciones. Se asume que las pre-configuraciones ya se encuentran en el host. (Sección 1)
