@@ -62,7 +62,7 @@ sh DB_download.sh
 Enter the output directory:
 /mnt/docker/DB_TumorSec
 ```
-La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, **NO** es un parámetro modificable. Se comenzarán a descargar las bases de datos (X GB). Para poder cerrar la consola (sin matar el proceso de descarga), la forma predeterminada de desconectarse de un contenedor interactivo es ```Ctrl + P Ctrl + Q```.
+La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, **NO** es un parámetro modificable. Se comenzarán a descargar las bases de datos (446 GB). Para poder cerrar la consola (sin matar el proceso de descarga), la forma predeterminada de desconectarse de un contenedor interactivo es ```Ctrl + P Ctrl + Q```.
 
 Fuera del contenedor creado, ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o detenidos. En la lista se encontrará el contenedor recientemente creado. Para ingresar al contenedor, ejecutar ```docker container attach CONTAINER_NAME``` y para desconectarse ```ctrl + P ctrl + Q```
 
