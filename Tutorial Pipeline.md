@@ -66,10 +66,10 @@ La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuraci√
 
 Fuera del contenedor creando, ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o detenidos. En la lista se encontrar√° el contenedor recientemente creado (ejemplo DOWNLOAD_DB). Para ingresar al contenedor, ejecutar ```docker container attach CONTAINER_NAME``` y para desconectarse ```Ctrl + P Ctrl + Q```
 
-Datos:
-Comando para listar contenedores: ```docker ps -a```
-Comando para detener un contenedor: ```docker stop CONTAINER_NAME```
-Comando para eliminar un contenedor: ```docker rm CONTAINER_NAME```
+*Datos:*
+-Comando para listar contenedores: ```docker ps -a```
+-Comando para detener un contenedor: ```docker stop CONTAINER_NAME```
+-Comando para eliminar un contenedor: ```docker rm CONTAINER_NAME```
 
 En caso de haber algun problema con la descarga, se debe detener el contenedor (ejemplo ```docker stop DOWNLOAD_DB```) y eliminarlo (```docker rm DOWNLOAD_DB```). 
 Luego se debe ejecutarse nuevamente el comando ```docker run...``` descrito anteriormente.
