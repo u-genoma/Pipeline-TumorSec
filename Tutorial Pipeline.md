@@ -50,7 +50,7 @@ La imagen ```labgenomicatumorsec/tumorsec:0.1``` contiene un script en bash ```D
 
 Para ejecutar este script se debe crear un contenedor de la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run), montando el directorio de descarga del host en el contenedor (con parámetro --mount). Para esto, ejecutar el siguiente comando:
 ```
-docker run --privileged -ti --name ***CONTAINER_NAME*** --mount type=bind,source=***/path/to/output_DB***,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --name CONTAINER_NAME --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
 Donde ```/path/to/output_DB``` y ```CONTAINER_NAME``` son los único parámetro que se deben modificar, corresponden al directorio donde se descargarán las bases de datos en el host y el nombre del contenedor dado por el usuario (ejemplo DOWNLOAD_DB). Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```.
 
@@ -62,18 +62,16 @@ sh DB_download.sh
 Enter the output directory:
 /mnt/docker/DB_TumorSec
 ```
-La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, **NO** es un parámetro modificable. Se comenzarán a descargar las bases de datos. Para poder cerrar la consola (sin matar el proceso de descarga), la forma predeterminada de desconectarse de un contenedor interactivo es ```Ctrl + P Ctrl + Q```.
+La ruta ```/mnt/docker/DB_TumorSec``` se encuentra en el archivo de configuración por defecto, por tanto, **NO** es un parámetro modificable. Se comenzarán a descargar las bases de datos (X GB). Para poder cerrar la consola (sin matar el proceso de descarga), la forma predeterminada de desconectarse de un contenedor interactivo es ```Ctrl + P Ctrl + Q```.
 
-Fuera del contenedor creando, ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o detenidos. En la lista se encontrará el contenedor recientemente creado (ejemplo DOWNLOAD_DB). Para ingresar al contenedor, ejecutar ```docker container attach CONTAINER_NAME``` y para desconectarse ```Ctrl + P Ctrl + Q```
+Fuera del contenedor creado, ejecutamos ```docker ps -a``` para listar los contenedores que esten ejecutandose o detenidos. En la lista se encontrará el contenedor recientemente creado. Para ingresar al contenedor, ejecutar ```docker container attach CONTAINER_NAME``` y para desconectarse ```Ctrl + P Ctrl + Q```
 
 *Datos:*
 * Comando para listar contenedores: ```docker ps -a```
 * Comando para detener un contenedor: ```docker stop CONTAINER_NAME```
 * Comando para eliminar un contenedor: ```docker rm CONTAINER_NAME```
 
-En caso de haber algun problema con la descarga, se debe detener el contenedor (ejemplo ```docker stop DOWNLOAD_DB```) y eliminarlo (```docker rm DOWNLOAD_DB```). 
-Luego se debe ejecutarse nuevamente el comando ```docker run...``` descrito anteriormente.
-
+En caso de haber algun problema con la descarga, se debe detener el contenedor (```docker stop CONTAINER_NAME```) y eliminarlo (```docker rm  CONTAINER_NAME```). Luego se debe ejecutarse nuevamente el comando ```docker run...``` descrito anteriormente.
 
 #### 1.4 Crear volumen para datos internos en la imagen
 
