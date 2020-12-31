@@ -41,7 +41,7 @@ Para verificar que se descargó la imagen:
 ```
 docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 2334cbb496ef        13 hours ago        9.04GB
+labgenomicatumorsec/tumorsec   0.1                 6b630587ab31        8 minutes ago       9.13GB
 centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
 #### 1.3 Descargar bases de datos externas
