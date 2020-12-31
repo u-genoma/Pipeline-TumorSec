@@ -15,7 +15,7 @@ Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesa
 groupadd --system docker
 sudo usermod -aG docker $USER
 ```
-Donde ```$USER``` es el nombre de usuario. Para verificar los permisos de usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie el servicio docker.
+Donde ```$USER``` es el nombre de usuario. Para verificar los permisos de usuario, este puede ejecutar ```docker image ls``` para listar las imagenes del sistema. En caso de arrojar error, reinicie la sesión de usuario y/o el servicio el docker.
 ```
 sudo systemctl restart docker
 ```
@@ -23,7 +23,7 @@ sudo systemctl restart docker
 
 La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta, se encuentra en la nube en un repositorio privado de Docker Hub. Procedemos a descargar la imagen.
 
-Primero verificamos que la imagen TumorSec no se encuentra en el sistema. Si se encuentra en la lista desplegada, podemos omitir este paso. Podemos observar que en este caso solo tenemos disponible una imagen de centos.
+Primero verificamos que la imagen TumorSec no se encuentra en el sistema con ```docker image ls```. Si se encuentra en la lista desplegada, podemos omitir este paso. Se observa que en este caso, solo tenemos disponible una imagen de centos.
 ```
 docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
@@ -48,9 +48,9 @@ centos                         7                   8652b9f0cb4c        6 weeks a
 
 La imagen ```labgenomicatumorsec/tumorsec:0.1``` contiene un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/docker/TumorSec ``` de la imagen. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
 
-Para ejecutar este script se debe crear un contenedor de la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run), ademas de montar el directorio de descarga del host en el contenedor (con parámetro --mount). Para esto, ejecutar el siguiente comando:
+Para ejecutar este script se debe crear un contenedor de la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run), montando el directorio de descarga del host en el contenedor (con parámetro --mount). Para esto, ejecutar el siguiente comando:
 ```
-docker run --privileged -ti --name CONTAINER_NAME --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --name ***CONTAINER_NAME*** --mount type=bind,source=***/path/to/output_DB***,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
 Donde ```/path/to/output_DB``` y ```CONTAINER_NAME``` son los único parámetro que se deben modificar, corresponden al directorio donde se descargarán las bases de datos en el host y el nombre del contenedor dado por el usuario (ejemplo DOWNLOAD_DB). Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```.
 
