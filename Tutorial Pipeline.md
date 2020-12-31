@@ -113,7 +113,10 @@ docker run --privileged -ti -d \
 labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
 En una linea 
-```docker run --privileged -ti -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash```
+
+```
+docker run --privileged -ti -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+```
 
 Descripción de los parámetros:
 - ```docker run``` : Crea un contenedor docker.
