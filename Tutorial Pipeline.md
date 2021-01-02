@@ -78,8 +78,16 @@ Finalmente, cuando se termine la descarga. Se desplegará el siguiente mensaje p
 *********************
 *** DONE-TumorSec ***
 *********************
- ```
-
+```
+Una vez terminada la descarga, comprobar que la carpeta ```/mnt/docker/DB_TumorSec/``` dentro de contenedor pesa 446 GB y que los últimos archivos descargados contienen en mismo código MD5. Los comandos se muestran a continuación:
+```
+# du -sh /mnt/docker/DB_TumorSec/
+446G	/mnt/docker/DB_TumorSec/
+# md5sum Mills_and_1000G_gold_standard.indels.hg19.sites.vcf
+d237e9aacf86037fcf41d75de1df88cc  Mills_and_1000G_gold_standard.indels.hg19.sites.vcf
+# md5sum Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.idx
+2af0b78dc57cb402dd7a479e891690b0  Mills_and_1000G_gold_standard.indels.hg19.sites.vcf.idx
+``` 
 #### 1.4 Crear volumen para datos internos en la imagen
 
 Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la imagen.
