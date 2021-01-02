@@ -79,7 +79,7 @@ Finalmente, cuando se termine la descarga. Se desplegará el siguiente mensaje p
 *** DONE-TumorSec ***
 *********************
 ```
-Una vez terminada la descarga, comprobar que la carpeta ```/mnt/docker/DB_TumorSec/``` dentro de contenedor pesa 446 GB y que los últimos archivos descargados contienen en mismo código MD5. Los comandos se muestran a continuación:
+Una vez terminada la descarga, comprobar que la carpeta ```/mnt/docker/DB_TumorSec/``` dentro de contenedor tiene un tamaño de 446 GB y que los últimos archivos descargados generan en mismo código MD5. Los comandos se muestran a continuación:
 ```
 # du -sh /mnt/docker/DB_TumorSec/
 446G	/mnt/docker/DB_TumorSec/
