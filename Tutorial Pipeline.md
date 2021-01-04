@@ -108,7 +108,62 @@ Una vez creado el volumen, este será utilizado para montar el directorio ```/do
 
 A continuación se lista los pasos necesarios para correr el pipeline de TumorSec para una corrida en particular. Cada vez que existe una nueva corrida de TumorSec, se deben seguir las siguientes instrucciones. Se asume que las pre-configuraciones ya se encuentran en el host. (Sección 1)
 
-#### 2.1 Crear un contenedor de TumorSec.
+#### 2.1 Montar datos de BaseSpace en contenedor.
+
+Para ejecutar el pipeline de TumorSec es necesario montar los datos de BaseSpace dentro del contenedor previamente creado. La corrida de secuenciación debe estar compartida en la cuenta de TumorSec de [BaseSpace Illumina](https://basespace.illumina.com/).
+
+Para montar los datos se deben seguir las siguientes instrucciones: 
+ - Ingresa a la carpeta docker del contenedor: ```cd /docker/```
+ - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```
+ - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de TumorSec.
+ - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /docker/BaseSpace/Runs/Nombre_Secuencion_Nueva```
+ - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.
+
+A continuación se observa un ejemplo:
+```
+cd /docker
+basemount BaseSpace/
+
+,-----.                        ,--.   ,--.                         ,--.
+|  |) /_  ,--,--. ,---.  ,---. |   `.'   | ,---. ,--.,--.,--,--, ,-'  '-.
+|  .-.  \' ,-.  |(  .-' | .-. :|  |'.'|  || .-. ||  ||  ||      \'-.  .-'
+|  '--' /\ '-'  |.-'  `)\   --.|  |   |  |' '-' ''  ''  '|  ||  |  |  |
+`------'  `--`--'`----'  `----'`--'   `--' `---'  `----' `--''--'  `--'
+Illumina BaseMount v0.15.103.3011 public develop 2019-05-08 08:56
+
+Command called:
+    basemount BaseSpace/
+From:
+    /Docker
+
+Starting authentication.
+
+You need to authenticate by opening this URL in a browser:
+  https://basespace.illumina.com/oauth/device?code=p1k65
+  
+```
+Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec. 
+- Usuario:tumorsec@gmail.com
+- Contraseña: UDT-seq#19
+Ahora podemos observar las corridas de TumorSec que fueron compartidas a la cuenta tumorsec@gmail.com
+```
+[root@2efef00d36c2 Docker]# cd BaseSpace/
+[root@2efef00d36c2 BaseSpace]# ls
+Projects  README  Runs
+[root@2efef00d36c2 BaseSpace]# cd Runs/
+[root@2efef00d36c2 Runs]# ls
+20190219 LIB ROCHE V1.1  P-DGT-R02         Tumorsec20200124  Tumorsec20200128
+Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
+[root@2efef00d36c2 Runs]# cd Tumorsec20200122/
+[root@2efef00d36c2 Tumorsec20200122]# pwd
+/Docker/BaseSpace/Runs/Tumorsec20200122
+[root@2efef00d36c2 Tumorsec20200122]#
+
+```
+Con la ruta de BaseSapce de la corrida (ej: ```/Docker/BaseSpace/Runs/Tumorsec20200122```) podemos correr el pipeline de tumorSec.
+
+
+#### 2.2 Crear un contenedor de TumorSec.
 
 Creamos un contenedor de TumorSec, ejecutando ```docker run```. El cual, desplegará una nueva terminal, con esto verificamos que estamos dentro del contenedor. Cualquier cambio realizado en el contenedor, será eliminado al momento de ser borrado el contenedor, por tanto, cada vez que existe una nueva corrida de secuenciación se debe crear un nuevo contenedor. 
 ```
@@ -173,61 +228,8 @@ Opcional: podemos vizualizar los contenedores del sistema con ```docker ps -a```
 
 Los pasos posteriores deben ser ejecutados, dentro del contenedor que se acaba de crear. 
 
-#### 2.1 Montar datos de BaseSpace en contenedor.
 
-Para ejecutar el pipeline de TumorSec es necesario montar los datos de BaseSpace dentro del contenedor previamente creado. La corrida de secuenciación debe estar compartida en la cuenta de TumorSec de [BaseSpace Illumina](https://basespace.illumina.com/).
-
-Para montar los datos se deben seguir las siguientes instrucciones: 
- - Ingresa a la carpeta docker del contenedor: ```cd /docker/```
- - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```
- - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de TumorSec.
- - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /docker/BaseSpace/Runs/Nombre_Secuencion_Nueva```
- - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.
-
-A continuación se observa un ejemplo:
-```
-cd /docker
-basemount BaseSpace/
-
-,-----.                        ,--.   ,--.                         ,--.
-|  |) /_  ,--,--. ,---.  ,---. |   `.'   | ,---. ,--.,--.,--,--, ,-'  '-.
-|  .-.  \' ,-.  |(  .-' | .-. :|  |'.'|  || .-. ||  ||  ||      \'-.  .-'
-|  '--' /\ '-'  |.-'  `)\   --.|  |   |  |' '-' ''  ''  '|  ||  |  |  |
-`------'  `--`--'`----'  `----'`--'   `--' `---'  `----' `--''--'  `--'
-Illumina BaseMount v0.15.103.3011 public develop 2019-05-08 08:56
-
-Command called:
-    basemount BaseSpace/
-From:
-    /Docker
-
-Starting authentication.
-
-You need to authenticate by opening this URL in a browser:
-  https://basespace.illumina.com/oauth/device?code=p1k65
-  
-```
-Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec. 
-- Usuario:tumorsec@gmail.com
-- Contraseña: UDT-seq#19
-Ahora podemos observar las corridas de TumorSec que fueron compartidas a la cuenta tumorsec@gmail.com
-```
-[root@2efef00d36c2 Docker]# cd BaseSpace/
-[root@2efef00d36c2 BaseSpace]# ls
-Projects  README  Runs
-[root@2efef00d36c2 BaseSpace]# cd Runs/
-[root@2efef00d36c2 Runs]# ls
-20190219 LIB ROCHE V1.1  P-DGT-R02         Tumorsec20200124  Tumorsec20200128
-Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
-[root@2efef00d36c2 Runs]# cd Tumorsec20200122/
-[root@2efef00d36c2 Tumorsec20200122]# pwd
-/Docker/BaseSpace/Runs/Tumorsec20200122
-[root@2efef00d36c2 Tumorsec20200122]#
-
-```
-Con la ruta de BaseSapce de la corrida (ej: ```/Docker/BaseSpace/Runs/Tumorsec20200122```) podemos correr el pipeline de tumorSec.
-
-#### 1.5 Opcional: Configurar archivo con parámetros de entrada
+#### 2.3 Opcional: Configurar archivo con parámetros de entrada
 
 Es posible cambiar los parámetros de entrada para la ejecucion del pipeline, en caso de no querer los parametros por defecto. Para esto, se creó en la imagen TumorSec el archivo ```00.conf_docker.ini ``` en la carpeta ```/docker/tumorSec ``` el cual será cargado al inicio de la ejecución del pipeline. Este archivo contiene los parámetros que se pueden modificar, el resto de los parámetros que no son modificables se encuentran en el archivo ```00.inputs_TumorSec.ini```.
 
@@ -260,7 +262,7 @@ large="50"
 window="10"
 
 ## VARIANT FILTERS
-AF="0.02"
+AF="0.05"
 ExAC="0.01"
 DP_ALT="12"
 
@@ -352,8 +354,6 @@ Cada vez que se cree una nueva versión de la imagen docker ```labgenomicatumors
 
 Para subir imagen a Docker Hub. 
 ```docker push labgenomicatumorsec/tumorsec:0.1```
-
-
 
 #### 4. Archivos de salida e interpretación de resultados. 
 
