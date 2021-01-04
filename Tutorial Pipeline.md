@@ -114,7 +114,7 @@ Para ejecutar el pipeline de TumorSec es necesario montar los datos de BaseSpace
 
 Para montar los datos se deben seguir las siguientes instrucciones: 
  - El programa basemount debe estar instalado en el host. Ver instruciones de instalación (https://help.basespace.illumina.com/articles/descriptive/introduction-to-basemount/#Installation)
- - Crear carpeta BaseSpace donde se montarán los datos ```mkdir BaseSpace```
+ - Crear carpeta BaseSpace donde se montarán los datos, en el home del usuario ```mkdir BaseSpace```
  - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```
  - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de BaseSpace.
  - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd ../BaseSpace/Runs/Nombre_Secuencion_Nueva```
@@ -160,13 +160,18 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 /BaseSpace/Runs/Tumorsec20200122
 
 ```
-Con la ruta de BaseSapce de la corrida (ej: ```/BaseSpace/Runs/Tumorsec20200122```) podemos correr el pipeline de tumorSec.
+- Copiar la carpeta de baseSpace (de la corrida) en algun directorio del home. Ejemplo:
+```
+cd /BaseSpace/Runs/
+cp -r Tumorsec20200122/ /home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/
+```
+Con la ruta de BaseSapce de la corrida (ej: ```/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/Tumorsec20200122```) podemos correr el pipeline de tumorSec.
 
 #### 2.2 Crear un contenedor de TumorSec.
 
 Creamos un contenedor de TumorSec, ejecutando ```docker run```. El cual, desplegará una nueva terminal, con esto verificamos que estamos dentro del contenedor. Cualquier cambio realizado en el contenedor, será eliminado al momento de ser borrado el contenedor, por tanto, cada vez que existe una nueva corrida de secuenciación se debe crear un nuevo contenedor. 
 ```
-docker run --privileged -ti -d \
+docker run --privileged -ti --name RUN_TUMORSEC\
 -v datatumorsec:/docker \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $(which docker):/usr/bin/docker \
@@ -177,14 +182,14 @@ labgenomicatumorsec/tumorsec:0.1 /bin/bash
 En una linea 
 
 ```
-docker run --privileged -ti -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --name RUN_TUMORSEC -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-
+***/path/to/output_DB y --name RUN_TUMORSEC son los únicos parámetros modificables.*** 
 Descripción de los parámetros:
 - ```docker run``` : Crea un contenedor docker.
 - ```--privileged``` : Da permisos root dentro del contenedor.
 - ```-ti``` : Permite crear un contenedor interactivo.
-- ```--rm``` : Elimina el contenedor al ingresar exit en la consola de este.
+- ```--name RUN_TUMORSEC``` : Nombre del contenedor,dado por el usuario.
 - ```-v datatumorsec:/docker``` : Monta el directorio ```/docker``` de la imagen en el volumen ```datatumorsec```
 - ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor.
 - ```-v $(which docker):/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor.
@@ -193,7 +198,7 @@ Descripción de los parámetros:
 - ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de Docker Hub. 
 - ```/bin/bash```: Contenedor ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
 
-El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta en donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). Ademas, el directorio ```/home``` en ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave``` debe ser remplazado, solo si la salida para la corrida no esta en el ```/home``` del usuario.
+El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta en donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). 
 
 Opcional: Una vez ejecutado el comando anterior podemos vizualizar los datos de la imagen: 
 ```
@@ -273,13 +278,13 @@ DP="250" ## profundidad por SNV identificada.
 ```
 Al cerrar el archivo, se deben guardar los cambios y poceder a ejecutar el pipeline de TumorSec en el actual contenedor.
 
-#### 2.4 Correr pipeline. 
+#### 2.4 Correr pipeline TumorSec. 
 
 Una vez configurado los parámetros de entrada necesarios podemos ejecutar el pipeline dentro del contenedor: 
-Se debe ejecutar el bash ```01.Run_TumorSec.sh```el cual pedirá la información necesario para la ejecucion. La información previa que debemos tener es: 
+Se debe ejecutar el bash ```01.Run_TumorSec.sh```el cual pedirá la información necesario para su ejecucion. La información previa que debemos tener es: 
 
- - Ruta del directorio donde serán almacenados los archivos de salida de pipeline. Ej: ```/mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122```
- - Ruta del directorio de BaseSpace de la corrida. Ej: ```/Docker/BaseSpace/Runs/Tumorsec20200122 ```(Sección 2.1)
+ - Ruta del directorio donde serán almacenados los archivos de salida de pipeline. Crear directorio en el home Ej: ```/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122```
+ - Ruta del directorio de BaseSpace de la corrida. Ej: ```/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/Tumorsec20200122 ```(Sección 2.1)
 
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
 
