@@ -297,26 +297,26 @@ Al cerrar el archivo, se deben guardar los cambios y poceder a ejecutar el pipel
 Una vez configurado los parámetros de entrada necesarios podemos ejecutar el pipeline dentro del contenedor: 
 Se debe ejecutar el bash ```01.Run_TumorSec.sh```el cual pedirá la información necesario para su ejecucion. La información previa que debemos tener es: 
 
- - Ruta del directorio donde serán almacenados los archivos de salida de pipeline. Crear directorio en el home Ej: ```/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122```
- - Ruta del directorio de BaseSpace de la corrida. Ej: ```/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/Tumorsec20200122 ```(Sección 2.1)
+ - Ruta del directorio donde serán almacenados los archivos de salida de pipeline. Crear directorio en el home Ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec```
+ - Ruta del directorio de BaseSpace de la corrida. Ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122 ```(Sección 2.1)
 
 Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
 
 ```
-[root@201792d839be /]# cd Docker/
+[root@201792d839be /]# cd docker/
 [root@201792d839be Docker]# ls
-BaseSpace  Inputs_TumorSec  Programas  TumorSec
-[root@201792d839be Docker]# cd TumorSec/
+BaseSpace Inputs_TumorSec  programas  tumorSec
+[root@201792d839be Docker]# cd tumorSec/
 [root@201792d839be TumorSec]# ls
 00.conf_docker.ini      01.Run_TumorSec.sh  03.Variants_reports.sh  complement
 00.inputs_TumorSec.ini  02.QC_Reports.sh    04.QC_dendogram.sh      scripts
 [root@201792d839be TumorSec]# sh 01.Run_TumorSec.sh
 
 Enter the output directory:
-/mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122
+/mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec
 
 Enter the BaseSpace directory:
-/Docker/BaseSpace/Runs/Tumorsec20200122
+/mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122
 
 What steps do you want to execute?
 0. Demultiplexing
@@ -347,17 +347,17 @@ Enter input parameters (path) or by default (0):
 == Search for somatic variants of oncological importance ==
 Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile
 
-Comando: sh /Docker/TumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122 --threads 10 --baseSpace /Docker/BaseSpace/Runs/Tumorsec20200122 --dendogram n --step 0-8 --input--data /Docker/TumorSec/00.inputs_TumorSec.ini
+Comando: sh /Docker/TumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122 --threads 10 --baseSpace /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/Tumorsec20200122 --dendogram n --step 0-8 --input--data /Docker/TumorSec/00.inputs_TumorSec.ini
 
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - start - demultiplexing
-Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/0_logs/0_log_demultiplexing.out
+Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/0_logs/0_log_demultiplexing.out
 ```
 
 A medida que se van ejecutando los subprocesos del flujo de trabajo, se van creando carpetas enumeradas de manera secuencial, con sus respectivos archivos de salida. Se crea una carpeta *0_logs* que contiene las salidas por pantalla de cada subproceso enumerado. Un subproceso terminado de manera correcta contiene el *string* DONE-TumorSec al final. A medida que se va ejecutando el pipeline se puede ir observando el avance de flujo de trabajo. 
 
 Ejemplo, ejecutar en el host:
 ```
-tail -f /home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/0_logs/0_log_demultiplexing.out
+tail -f /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/0_logs/0_log_demultiplexing.out
 ```
 
 ### 3. Contrucción de imagen docker 
