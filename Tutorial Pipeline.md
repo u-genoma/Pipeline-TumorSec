@@ -185,7 +185,7 @@ En una linea
 ```
 docker run --privileged -ti --name CONTAINER_NAME -e DB_HOST="/path/to/output_DB" -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-***/path/to/output_DB y CONTAINER_NAME son los únicos parámetros modificables.*** 
+Donde: **/path/to/output_DB** y **CONTAINER_NAME** son los únicos parámetros modificables.*** 
 
 Descripción de los parámetros:
 - ```docker run``` : Crea un contenedor docker.
