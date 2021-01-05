@@ -52,7 +52,7 @@ Para ejecutar este script se debe crear un contenedor de la imagen docker ```lab
 ```
 docker run --privileged -ti --name CONTAINER_NAME --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-Donde ```/path/to/output_DB``` y ```CONTAINER_NAME``` son los único parámetro que se deben modificar, corresponden al directorio donde se descargarán las bases de datos en el host y el nombre del contenedor dado por el usuario (ejemplo DOWNLOAD_DB). Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```.
+Donde ```/path/to/output_DB``` y ```CONTAINER_NAME``` son los único parámetro que se deben modificar, corresponden al directorio donde se descargarán las bases de datos en el host y el nombre del contenedor dado por el usuario (ejemplo DOWNLOAD_DB). Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```. Dato: si ya existe un contenedor con el mismo nombre, se debe cambiar el nombre del contenedor y/o eliminar el contenedor antiguo con el mismo nombre.
 
 Dentro del contenedor docker que acabamos de crear con docker run, se encuentra el directorio ```/docker/tumorSec```, podemos observar con ```ls``` que se encuentra un archivo .sh ```DB_download.sh```, este descargará todas las bases de datos necesarias para correr TurmorSec. Ejecutar el script ```DB_download.sh``` e ingresar la ruta ```/mnt/docker/DB_TumorSec``` donde serán almacenadas las bases de datos. A continuación, ejecutar (dentro del contenedor):
 
@@ -171,7 +171,8 @@ Con la ruta de BaseSapce de la corrida (ej: ```/home/egonzalez/workSpace/runs_Tu
 
 Creamos un contenedor de TumorSec, ejecutando ```docker run```. El cual, desplegará una nueva terminal, con esto verificamos que estamos dentro del contenedor. Cualquier cambio realizado en el contenedor, será eliminado al momento de ser borrado el contenedor, por tanto, cada vez que existe una nueva corrida de secuenciación se debe crear un nuevo contenedor. 
 ```
-docker run --privileged -ti --name RUN_TUMORSEC\
+docker run --privileged -ti --name CONTAINER_NAME\
+-e DB_HOST="/path/to/output_DB" \
 -v datatumorsec:/docker \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $(which docker):/usr/bin/docker \
@@ -182,14 +183,16 @@ labgenomicatumorsec/tumorsec:0.1 /bin/bash
 En una linea 
 
 ```
-docker run --privileged -ti --name RUN_TUMORSEC -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --name CONTAINER_NAME -e DB_HOST="/path/to/output_DB" -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-***/path/to/output_DB y --name RUN_TUMORSEC son los únicos parámetros modificables.*** 
+***/path/to/output_DB y CONTAINER_NAME son los únicos parámetros modificables.*** 
+
 Descripción de los parámetros:
 - ```docker run``` : Crea un contenedor docker.
 - ```--privileged``` : Da permisos root dentro del contenedor.
 - ```-ti``` : Permite crear un contenedor interactivo.
-- ```--name RUN_TUMORSEC``` : Nombre del contenedor,dado por el usuario.
+- ```--name CONTAINER_NAME``` : Nombre del contenedor,dado por el usuario.
+- ```-e DB_HOST="/path/to/output_DB"```: Agregamos una variable DB_HOST al contenedor con la ruta del bases de datos en el host.
 - ```-v datatumorsec:/docker``` : Monta el directorio ```/docker``` de la imagen en el volumen ```datatumorsec```
 - ```-v /var/run/docker.sock:/var/run/docker.sock``` : Vincula el docker del host al nuevo contenedor.
 - ```-v $(which docker):/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor.
