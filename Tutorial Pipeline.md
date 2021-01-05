@@ -117,8 +117,9 @@ Para montar los datos se deben seguir las siguientes instrucciones:
  - Crear carpeta BaseSpace donde se montarán los datos, en el home del usuario ```mkdir BaseSpace```
  - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```
  - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de BaseSpace.
- - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd ../BaseSpace/Runs/Nombre_Secuencion_Nueva```
- - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.
+ - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /BaseSpace/Runs/NOMBRE_SECUENCIACION```
+ - Copiar la carpeta ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` en algún directorio del home. 
+ - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
 
 A continuación se observa un ejemplo:
 ```
@@ -143,10 +144,10 @@ You need to authenticate by opening this URL in a browser:
   https://basespace.illumina.com/oauth/device?code=p1k65
   
 ```
-Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec. 
+Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec o la cuenta personal de usuario.
 - Usuario:tumorsec@gmail.com
 - Contraseña: UDT-seq#19
-Ahora podemos observar las corridas de TumorSec que fueron compartidas a la cuenta tumorsec@gmail.com
+Ahora podemos observar las secuenciaciones que fueron compartidas a la cuenta tumorsec@gmail.com
 ```
 # cd BaseSpace/
 # ls
@@ -160,12 +161,15 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 /BaseSpace/Runs/Tumorsec20200122
 
 ```
-- Copiar la carpeta de baseSpace (de la corrida) en algun directorio del home. Ejemplo:
+- En este ejemplo,  ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` es la ruta```/BaseSpace/Runs/Tumorsec20200122```
+- Copiar la carpeta de baseSpace (de la corrida: ```/BaseSpace/Runs/NOMBRE_SECUENCIACION```) en algun directorio previamente creado en el home(``` mkdir /home/$USER/TUMORSEC_RUN1```). Consejo: Usar screen.```cp -r /BaseSpace/Runs/NOMBRE_SECUENCIACION /home/$USER/TUMORSEC_RUN1``` 
+
+Ejemplo:
 ```
-cd /BaseSpace/Runs/
-cp -r Tumorsec20200122/ /home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/
+mkdir /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec
+cp -r /BaseSpace/Runs/Tumorsec20200122/ /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/
 ```
-Con la ruta de BaseSapce de la corrida (ej: ```/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/Tumorsec20200122```) podemos correr el pipeline de tumorSec.
+Con la ruta de la corrida copiada al home (ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122```) podemos correr el pipeline de tumorSec. Esta carpeta suele tener entre 6-7 GB de tamaño, en el MiSeq. **Dato:** Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
 
 #### 2.2 Crear un contenedor de TumorSec.
 
@@ -185,7 +189,7 @@ En una linea
 ```
 docker run --privileged -ti --name CONTAINER_NAME -e DB_HOST="/path/to/output_DB" -v datatumorsec:/docker -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):/usr/bin/docker --mount type=bind,source=/home/,target=/mnt/home,bind-propagation=rslave --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
-Donde: **/path/to/output_DB** y **CONTAINER_NAME** son los únicos parámetros modificables.*** 
+Donde: **/path/to/output_DB** y **CONTAINER_NAME** son los únicos parámetros modificables.
 
 Descripción de los parámetros:
 - ```docker run``` : Crea un contenedor docker.
@@ -234,7 +238,6 @@ docker/
 Opcional: podemos vizualizar los contenedores del sistema con ```docker ps -a```. Para evitar el exceso de contenedores es posible eliminarlos con el comando ```docker rm ID_container```
 
 Los pasos posteriores deben ser ejecutados, dentro del contenedor que se acaba de crear. 
-
 
 #### 2.3 Opcional: Configurar archivo con parámetros de entrada
 
