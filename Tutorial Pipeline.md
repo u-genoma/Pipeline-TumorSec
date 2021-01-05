@@ -159,7 +159,7 @@ Projects  README  Runs
 # ls
 20190219 LIB ROCHE V1.1  P-DGT-R02         Tumorsec20200124  Tumorsec20200128
 Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
-[root@2efef00d36c2 Runs]# cd Tumorsec20200122/
+# cd Tumorsec20200122/
 # pwd
 /BaseSpace/Runs/Tumorsec20200122
 
