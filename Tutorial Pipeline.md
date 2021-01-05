@@ -300,7 +300,7 @@ Se debe ejecutar el bash ```01.Run_TumorSec.sh```el cual pedirá la información
  - Ruta del directorio donde serán almacenados los archivos de salida de pipeline. Crear directorio en el home Ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec```
  - Ruta del directorio de BaseSpace de la corrida. Ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122 ```(Sección 2.1)
 
-Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
+Dato: **NO** poner más de 10 *Threads* en caso de tener cerca de 32 GB de memoria RAM, de esta manera no saturamos el sistema. Ejemplo de ejecución de TumorSec, dentro del contenedor que fue previamente configurado.
 
 ```
 [root@201792d839be /]# cd docker/
