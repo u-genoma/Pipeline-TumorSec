@@ -347,17 +347,17 @@ Enter input parameters (path) or by default (0):
 == Search for somatic variants of oncological importance ==
 Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile
 
-Comando: sh /Docker/TumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122 --threads 10 --baseSpace /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/Tumorsec20200122 --dendogram n --step 0-8 --input--data /Docker/TumorSec/00.inputs_TumorSec.ini
+Comando: sh /Docker/TumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec --threads 10 --baseSpace /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/Tumorsec20200122 --dendogram n --step 0-8 --input--data /Docker/TumorSec/00.inputs_TumorSec.ini
 
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - start - demultiplexing
-Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/0_logs/0_log_demultiplexing.out
+Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_demultiplexing.out
 ```
 
 A medida que se van ejecutando los subprocesos del flujo de trabajo, se van creando carpetas enumeradas de manera secuencial, con sus respectivos archivos de salida. Se crea una carpeta *0_logs* que contiene las salidas por pantalla de cada subproceso enumerado. Un subproceso terminado de manera correcta contiene el *string* DONE-TumorSec al final. A medida que se va ejecutando el pipeline se puede ir observando el avance de flujo de trabajo. 
 
 Ejemplo, ejecutar en el host:
 ```
-tail -f /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/0_logs/0_log_demultiplexing.out
+tail -f /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_demultiplexing.out
 ```
 
 ### 3. Contrucción de imagen docker 
