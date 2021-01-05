@@ -162,15 +162,19 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 /BaseSpace/Runs/Tumorsec20200122
 
 ```
-- En este ejemplo,  ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` es la ruta```/BaseSpace/Runs/Tumorsec20200122```
-- Copiar la carpeta de baseSpace (de la corrida: ```/BaseSpace/Runs/NOMBRE_SECUENCIACION```) en algun directorio previamente creado en el home(``` mkdir /home/$USER/TUMORSEC_RUN1```). Consejo: Usar screen.```cp -r /BaseSpace/Runs/NOMBRE_SECUENCIACION /home/$USER/TUMORSEC_RUN1``` 
+- En este ejemplo, ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` es la ruta```/BaseSpace/Runs/Tumorsec20200122```
+- Copiar la carpeta de baseSpace (```/BaseSpace/Runs/NOMBRE_SECUENCIACION```) en algun directorio previamente creado en el home: ``` mkdir /home/$USER/TUMORSEC_RUN1```. 
+
+Consejo: Usar screen.
+```cp -r /BaseSpace/Runs/NOMBRE_SECUENCIACION /home/$USER/TUMORSEC_RUN1``` 
 
 Ejemplo:
 ```
 mkdir /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec
 cp -r /BaseSpace/Runs/Tumorsec20200122/ /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/
 ```
-Con la ruta de la corrida copiada al home (ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122```) podemos correr el pipeline de tumorSec. Esta carpeta suele tener entre 6-7 GB de tamaño, en el MiSeq. **Dato:** Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
+Con la ruta de la corrida copiada al home (ej: ```/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122```) podemos correr el pipeline de tumorSec. Esta carpeta suele tener un tamaño entre 6-7 GB en el MiSeq.
+**Dato:** Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
 
 #### 2.2 Crear un contenedor de TumorSec.
 
