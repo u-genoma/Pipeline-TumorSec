@@ -166,6 +166,7 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 - Copiar la carpeta de baseSpace (```/BaseSpace/Runs/NOMBRE_SECUENCIACION```) en algun directorio previamente creado en el home: ``` mkdir /home/$USER/TUMORSEC_RUN1```. 
 
 Consejo: Usar screen.
+
 ```cp -r /BaseSpace/Runs/NOMBRE_SECUENCIACION /home/$USER/TUMORSEC_RUN1``` 
 
 Ejemplo:
