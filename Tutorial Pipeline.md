@@ -115,11 +115,13 @@ Para ejecutar el pipeline de TumorSec es necesario montar los datos de BaseSpace
 Para montar los datos se deben seguir las siguientes instrucciones: 
  - El programa basemount debe estar instalado en el host. Ver instruciones de instalación (https://help.basespace.illumina.com/articles/descriptive/introduction-to-basemount/#Installation)
  - Crear carpeta BaseSpace donde se montarán los datos, en el home del usuario ```mkdir BaseSpace```
- - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```
+ - Montar datos en la carpeta BaseSpace: ```basemount BaseSpace/```.
  - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de BaseSpace.
  - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /BaseSpace/Runs/NOMBRE_SECUENCIACION```
  - Copiar la carpeta ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` en algún directorio del home. 
  - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
+ 
+Dato: Ejecutar ```basemount --remove-config``` para eliminar cconfiuna cuenta de BaseSpace pre-existente, en caso de cambiar a una nueva.
 
 A continuación se observa un ejemplo:
 ```
@@ -165,7 +167,7 @@ Lib ROCHE v.1            Tumorsec20200122  Tumorsec20200127  Tumorsec20200130
 - En este ejemplo, ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` es la ruta```/BaseSpace/Runs/Tumorsec20200122```
 - Copiar la carpeta de baseSpace (```/BaseSpace/Runs/NOMBRE_SECUENCIACION```) en algun directorio previamente creado en el home: ``` mkdir /home/$USER/TUMORSEC_RUN1```. 
 
-Consejo: Usar screen.
+Consejo: Usar *screen*.
 
 ```cp -r /BaseSpace/Runs/NOMBRE_SECUENCIACION /home/$USER/TUMORSEC_RUN1``` 
 
