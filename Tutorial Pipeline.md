@@ -351,6 +351,13 @@ Mon Feb 17 15:43:17 UTC 2020 : step 0 - start - demultiplexing
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/0_logs/0_log_demultiplexing.out
 ```
 
+A medida que se van ejecutando los subprocesos del flujo de trabajo, se van creando carpetas enumeradas de manera secuencial, con sus respectivos archivos de salida. Se crea una carpeta *0_logs* que contiene las salidas por pantalla de cada subproceso enumerado. Un subproceso terminado de manera correcta contiene el *string* DONE-TumorSec al final. A medida que se va ejecutando el pipeline se puede ir observando el avance de flujo de trabajo. 
+
+Ejemplo, ejecutar en el host:
+```
+tail -f /home/egonzalez/workSpace/runs_TumorSec/Docker_subset_200122/0_logs/0_log_demultiplexing.out
+```
+
 ### 3. Contrucción de imagen docker 
 
 El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
