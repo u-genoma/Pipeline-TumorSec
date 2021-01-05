@@ -121,7 +121,7 @@ Para montar los datos se deben seguir las siguientes instrucciones:
  - Copiar la carpeta ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` en algún directorio del home. 
  - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
  
-Dato: Ejecutar ```basemount --remove-config``` para eliminar cconfiuna cuenta de BaseSpace pre-existente, en caso de cambiar a una nueva.
+Dato: Ejecutar ```basemount --remove-config``` para eliminar configuración de una cuenta de BaseSpace pre-existente, en caso de cambiar a una nueva.
 
 A continuación se observa un ejemplo:
 ```
