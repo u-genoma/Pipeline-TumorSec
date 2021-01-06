@@ -360,7 +360,38 @@ Ejemplo, ejecutar en el host:
 tail -f /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_demultiplexing.out
 ```
 
-### 3. Contrucción de imagen docker 
+
+#### 3. Archivos de salida e interpretación de resultados. 
+
+Finalmente las carpetas de salida generadas por corrida son: 
+- 0_logs : archivos .log con las salidas de cada subproceso del flujo de trabajo de TumorSec.
+- 1_fastq
+- 2_trim
+- TMP_bwa
+- TMP_dedup
+- TMP_realign
+- 3_bqsr
+- **4_QC_reports**
+- multiqc_data
+- multiqc_plots
+- multiqc_report.html
+- 5_varcall
+- 6_annotate
+- **7_variants_report**
+- 8_RGO
+
+Las carpetas destacadas en negrita, contiene reportes en PDF con un resumen de los resultados por muestra.
+- **4_QC_reports**
+ - 4.1_images
+ - 4.2_reports
+ - 4.3_tables
+-  **7_variants_report**
+ - 7.1_excel
+ - 7.2_pdf_report
+ - 7.3_summary_output
+ - 7.4_Images
+ 
+### 5. Contrucción de imagen docker 
 
 El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
 
@@ -379,6 +410,4 @@ Cada vez que se cree una nueva versión de la imagen docker ```labgenomicatumors
 
 Para subir imagen a Docker Hub. 
 ```docker push labgenomicatumorsec/tumorsec:0.1```
-
-#### 4. Archivos de salida e interpretación de resultados. 
 
