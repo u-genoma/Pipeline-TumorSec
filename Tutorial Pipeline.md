@@ -119,7 +119,7 @@ Para montar los datos se deben seguir las siguientes instrucciones:
  - Copiar el link desplegado, en navegador e ingresar datos de la cuenta de BaseSpace.
  - Verificar que la corrida de secuenciación se encuentra en los datos montados: ```cd /BaseSpace/Runs/NOMBRE_SECUENCIACION```
  - Copiar la carpeta ```/BaseSpace/Runs/NOMBRE_SECUENCIACION``` en algún directorio del home. 
- - Guardar esta ruta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
+ - Guardar la ruta donde fue copiada la carpeta, ya que será uno de los parámetros de entrada del pipeline.(Sección 2.4)
  
 Dato: Ejecutar ```basemount --remove-config``` para eliminar configuración de una cuenta de BaseSpace pre-existente, en caso de cambiar a una nueva.
 
@@ -347,7 +347,7 @@ Enter input parameters (path) or by default (0):
 == Search for somatic variants of oncological importance ==
 Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile
 
-Comando: sh /Docker/TumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec --threads 10 --baseSpace /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/Tumorsec20200122 --dendogram n --step 0-8 --input--data /Docker/TumorSec/00.inputs_TumorSec.ini
+Comando: sh /docker/tumorSec/01.Run_TumorSec.sh --input--dir /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec --threads 10 --baseSpace /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/Tumorsec20200122/Tumorsec20200122 --dendogram n --step 0-8 --input--data /docker/tumorSec/00.inputs_TumorSec.ini
 
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - start - demultiplexing
 Mon Feb 17 15:43:17 UTC 2020 : step 0 - logfile - /mnt/home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_demultiplexing.out
