@@ -377,31 +377,31 @@ tail -f /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_dem
 
 Finalmente las carpetas de salida generadas por corrida son: 
 - ```0_logs```: Archivos .log con las salidas de cada subproceso del flujo de trabajo de TumorSec.
-- ```1_fastq```: 
-- ```2_trim```:
-- ```TMP_bwa```
-- ```TMP_dedup
-- ```TMP_realign
-- ```3_bqsr
-- ```4_QC_reports```
-- ```multiqc_data```
-- ```multiqc_plots```
-- ```multiqc_report.html```
-- ```5_varcall```
-- ```6_annotate```
-- ```7_variants_report```
-- ```8_RGO```
+- ```1_fastq```: Archivos fastq.gz pareados (R1 y R2) obtenidos del demultiplexado de datos. Todas las lecturas por muestra, sin filtros.
+- ```2_trim```: Archivos fastq.gz pareados (R1 y R2) despues del *trimming* de datos.
+- ```TMP_bwa```: Archivos .SAM .BAM resultados del alineamiento de las lecturas al genoma de referencia.
+- ```TMP_dedup```: Archivos .BAM con las lecturas duplicadas marcadas.
+- ```TMP_realign```: Archivos .BAM con las lecturas re alineadas en posibles InDels.
+- ```3_bqsr```: .BAM con los puntajes de base recalibrados.
+- ```4_QC_reports```: Reportes de calidad (PDFs) de la secuenciación por muestra, en la carpeta ()
+- ```multiqc_data```:  Datos del reporte de dalidad dado por MultiQC *multiqc_report.html*
+- ```multiqc_plots```: Gráficos de calidad de reporte de calidad dado por MultiQC *multiqc_report.html*
+- ```multiqc_report.html```: Reporte en html con reporte de calidad dado por MultiQC.
+- ```5_varcall```: Resultado del llamado de variantes por muestra realizado por SomaticSeq
+- ```6_annotate```: Variantes anotadas con annovar y GCI en las carpetas ```6.1_ANNOVAR``` y  ```6.2_CGI```
+- ```7_variants_report```: Imagenes, datos y reporte de las variantes por muestra.
+- ```8_RGO```: Archivos VCF por muestras, con variantes filtradas: PASS, VAF>=0.05, DP_ALT>=12. Estos VFC son input en la plataforma RGO (Reporte Genómico de Oncología)
 
-Las carpetas destacadas en negrita, contiene reportes en PDF con un resumen de los resultados por muestra.
-- **4_QC_reports**
- - 4.1_images
- - 4.2_reports
- - 4.3_tables
--  **7_variants_report**
- - 7.1_excel
- - 7.2_pdf_report
- - 7.3_summary_output
- - 7.4_Images
+Las carpetas 4 y 7 contiene reportes en PDF con un resumen de los resultados por muestra. Es importante revisarlos en cada secuenciación.
+- ```4_QC_reports```
+ + ```4.1_images```
+ + ```4.2_reports```
+ + ```4.3_tables```
+- ```7_variants_report```
+ + ```7.1_excel```
+ + ```7.2_pdf_report```
+ + ```7.3_summary_output```
+ + ```7.4_Images```
  
 ### 5. Contrucción de imagen docker 
 
