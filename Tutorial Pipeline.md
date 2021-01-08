@@ -381,14 +381,14 @@ Finalmente las carpetas de salida generadas por corrida son:
 - ```2_trim```: Archivos fastq.gz pareados (R1 y R2) despues del *trimming* de datos.
 - ```TMP_bwa```: Archivos .SAM .BAM resultados del alineamiento de las lecturas al genoma de referencia.
 - ```TMP_dedup```: Archivos .BAM con las lecturas duplicadas marcadas.
-- ```TMP_realign```: Archivos .BAM con las lecturas re alineadas en posibles InDels.
+- ```TMP_realign```: Archivos .BAM con las lecturas re-alineadas en posibles InDels.
 - ```3_bqsr```: .BAM con los puntajes de base recalibrados.
-- ```4_QC_reports```: Reportes de calidad (PDFs) de la secuenciación por muestra, en la carpeta ()
-- ```multiqc_data```:  Datos del reporte de dalidad dado por MultiQC *multiqc_report.html*
-- ```multiqc_plots```: Gráficos de calidad de reporte de calidad dado por MultiQC *multiqc_report.html*
-- ```multiqc_report.html```: Reporte en html con reporte de calidad dado por MultiQC.
-- ```5_varcall```: Resultado del llamado de variantes por muestra realizado por SomaticSeq
-- ```6_annotate```: Variantes anotadas con annovar y GCI en las carpetas ```6.1_ANNOVAR``` y  ```6.2_CGI```
+- ```4_QC_reports```: Reportes de calidad (PDFs) de la secuenciación por muestra, en la carpeta.
+- ```multiqc_data```:  Datos del reporte de calidad dado por MultiQC *multiqc_report.html*.
+- ```multiqc_plots```: Gráficos del reporte de calidad dado por MultiQC *multiqc_report.html*.
+- ```multiqc_report.html```: Archivo html, reporte de calidad dado por MultiQC.
+- ```5_varcall```: Resultado del llamado de variantes por muestra realizado por SomaticSeq.
+- ```6_annotate```: Variantes anotadas con ANNOVAR y CGI en las carpetas ```6.1_ANNOVAR``` y ```6.2_CGI```.
 - ```7_variants_report```: Imagenes, datos y reporte de las variantes por muestra.
 - ```8_RGO```: Archivos VCF por muestras, con variantes filtradas: PASS, VAF>=0.05, DP_ALT>=12. Estos VFC son input en la plataforma RGO (Reporte Genómico de Oncología)
 
