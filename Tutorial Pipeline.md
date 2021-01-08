@@ -25,13 +25,13 @@ La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sis
 
 Primero verificamos que la imagen TumorSec no se encuentra en el sistema con ```docker image ls```. Si se encuentra en la lista desplegada, podemos omitir este paso. Se observa que en este caso, solo tenemos disponible una imagen de centos.
 ```
-docker image ls
+#docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
 centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
 Ejecutamos las siguientes instrucciones para la descarga.
 ```
-docker login docker.io
+#docker login docker.io
 Username: labgenomicatumorsec
 Password: UDT-seq#19
 
@@ -39,7 +39,7 @@ docker pull labgenomicatumorsec/tumorsec:0.1
 ```
 Para verificar que se descargó la imagen:
 ```
-docker image ls
+#docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
 labgenomicatumorsec/tumorsec   0.1                 6b630587ab31        8 minutes ago       9.13GB
 centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
@@ -47,7 +47,7 @@ centos                         7                   8652b9f0cb4c        6 weeks a
 **Importante**: La primera vez que se ejecute el pipeline de TumorSec, se decargarán las imagenes de docker necesarias para ejecutar SomaticSeq en el llamado de variantes, para esto, es necesario tener aproximadamente 10GB de memoria disponible en docker. Ejecutar el comando ```docker system df``` para ver la cantidad de memoria disponible. 
 Ejemplo: 
 ```
- docker system df
+#docker system df
 TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
 Images              11                  1                   19.55GB             14.32GB (73%)
 Containers          1                   1                   687.1kB             0B (0%)
