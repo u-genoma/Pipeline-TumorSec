@@ -394,14 +394,14 @@ Finalmente las carpetas de salida generadas por corrida son:
 
 Las carpetas 4 y 7 contiene reportes en PDF con un resumen de los resultados por muestra. Es importante revisarlos en cada secuenciación.
 - ```4_QC_reports```
- + ```4.1_images```
- + ```4.2_reports```
- + ```4.3_tables```
+     + ```4.1_images```: Imágenes incluidas en el reporte de calidad.
+     + ```4.2_reports```: PDFs, *Reporte_corrida201219_TumorSec.pdf* reporte de calidad de la secuenciación por muestra. *Complement_report.pdf*: reporte complementario, con información de la cobertura obtenida por región blanco para cada muestra.
+     + ```4.3_tables```: Datos incluidos en los reportes.
 - ```7_variants_report```
- + ```7.1_excel```
- + ```7.2_pdf_report```
- + ```7.3_summary_output```
- + ```7.4_Images```
+     + ```7.1_excel```: Archivos Excel con la variantes sin filtrar para cada muestra. El archivo *All_samples_clasificacion-variantes.xlsx* contiene la información de las variantes filtradas para las muestra secuenciadas.Se incluye la anotación y de ANNOVAR y CGI.
+     + ```7.2_pdf_report```: Reporte con el resumen de las variantes encontradas.
+     + ```7.3_summary_output```: Datos incluidos en los reportes.
+     + ```7.4_Images```: Imágenes del reporte.
  
 ### 5. Contrucción de imagen docker 
 
