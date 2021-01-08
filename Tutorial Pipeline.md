@@ -376,21 +376,21 @@ tail -f /home/egonzalez/workSpace/runs_TumorSec/200122_TumorSec/0_logs/0_log_dem
 #### 3. Archivos de salida e interpretación de resultados. 
 
 Finalmente las carpetas de salida generadas por corrida son: 
-- 0_logs : archivos .log con las salidas de cada subproceso del flujo de trabajo de TumorSec.
-- 1_fastq
-- 2_trim
-- TMP_bwa
-- TMP_dedup
-- TMP_realign
-- 3_bqsr
-- **4_QC_reports**
-- multiqc_data
-- multiqc_plots
-- multiqc_report.html
-- 5_varcall
-- 6_annotate
-- **7_variants_report**
-- 8_RGO
+- ```0_logs```: Archivos .log con las salidas de cada subproceso del flujo de trabajo de TumorSec.
+- ```1_fastq```: 
+- ```2_trim```:
+- ```TMP_bwa```
+- ```TMP_dedup
+- ```TMP_realign
+- ```3_bqsr
+- ```4_QC_reports```
+- ```multiqc_data```
+- ```multiqc_plots```
+- ```multiqc_report.html```
+- ```5_varcall```
+- ```6_annotate```
+- ```7_variants_report```
+- ```8_RGO```
 
 Las carpetas destacadas en negrita, contiene reportes en PDF con un resumen de los resultados por muestra.
 - **4_QC_reports**
