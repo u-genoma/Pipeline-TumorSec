@@ -19,7 +19,7 @@ Donde ```$USER``` es el nombre de usuario. Para verificar los permisos de usuari
 ```
 sudo systemctl restart docker
 ```
-#### 1.2. Descargar imagen docker Tumorsec
+#### 1.2. Descargar imagen docker Tumorsec y externas necesarias
 
 La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta, se encuentra en la nube en un repositorio privado de Docker Hub. Procedemos a descargar la imagen.
 
@@ -44,6 +44,18 @@ REPOSITORY                     TAG                 IMAGE ID            CREATED  
 labgenomicatumorsec/tumorsec   0.1                 6b630587ab31        8 minutes ago       9.13GB
 centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
+**Importante**: La primera vez que se ejecute el pipeline de TumorSec, se decargarán las imagenes de docker necesarias para ejecutar SomaticSeq en el llamado de variantes, para esto, es necesario tener aproximadamente 10GB de memoria disponible en docker. Ejecutar el comando ```docker system df``` para ver la cantidad de memoria disponible. 
+Ejemplo: 
+```
+ docker system df
+TYPE                TOTAL               ACTIVE              SIZE                RECLAIMABLE
+Images              11                  1                   19.55GB             14.32GB (73%)
+Containers          1                   1                   687.1kB             0B (0%)
+Local Volumes       1                   1                   26.51kB             0B (0%)
+Build Cache         0                   0                   0B                  0B
+```
+En este caso existe un total de 14.32 GB disponibles. 
+
 #### 1.3 Descargar bases de datos externas
 
 La imagen ```labgenomicatumorsec/tumorsec:0.1``` contiene un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/docker/TumorSec ``` de la imagen. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
