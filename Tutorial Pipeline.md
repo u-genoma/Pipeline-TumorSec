@@ -44,7 +44,7 @@ REPOSITORY                     TAG                 IMAGE ID            CREATED  
 labgenomicatumorsec/tumorsec   0.1                 6b630587ab31        8 minutes ago       9.13GB
 centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
-**Importante**: La primera vez que se ejecute el pipeline de TumorSec, se decargarán las imagenes de docker necesarias para ejecutar SomaticSeq en el llamado de variantes, para esto, es necesario tener aproximadamente 10GB de memoria disponible en docker. Ejecutar el comando ```docker system df``` para ver la cantidad de memoria disponible. 
+**Importante**: La primera vez que se ejecute el pipeline de TumorSec, se decargarán las imagenes de docker necesarias para ejecutar SomaticSeq en el llamado de variantes, para esto, es necesario tener aproximadamente 20GB de memoria disponible en docker. Ejecutar el comando ```docker system df``` para ver la cantidad de espacio de disco disponible. 
 Ejemplo: 
 ```
 #docker system df
@@ -54,8 +54,33 @@ Containers          1                   1                   687.1kB             
 Local Volumes       1                   1                   26.51kB             0B (0%)
 Build Cache         0                   0                   0B                  0B
 ```
-En este caso existe un total de 14.32 GB disponibles. 
-
+En este caso existe un total de 14.32 GB disponibles. Para asegurar la funcionalidad del llamado de variantes, se recomiendo descargar previamente las imagenes  de docker necesarias. Para esto, ejecutar: 
+```
+docker pull broadinstitute/gatk:4.0.5.2
+docker pull lethalfang/lofreq:2.1.3.1-1
+docker pull lethalfang/scalpel:0.5.4
+docker pull lethalfang/tabix:1.7
+docker pull lethalfang/strelka:2.9.5
+docker pull lethalfang/vardictjava:1.5.2
+docker pull lethalfang/samtools:1.7
+docker pull djordjeklisic/sbg-varscan2:v1
+```
+Revisamos las imagenes disponibles en el host.
+```
+docker image ls
+REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
+labgenomicatumorsec/tumorsec   0.1                 11213c4c4ad2        39 hours ago        9.68GB
+centos                         7                   8652b9f0cb4c        8 weeks ago         204MB
+lethalfang/somaticseq          3.1.1               abd3208c2b66        23 months ago       1.33GB
+lethalfang/strelka             2.9.5               a47ee82d2a60        2 years ago         304MB
+lethalfang/scalpel             0.5.4               cca8678e328b        2 years ago         527MB
+lethalfang/lofreq              2.1.3.1-1           21c2cd913130        2 years ago         550MB
+lethalfang/tabix               1.7                 a4d2dc14f90b        2 years ago         137MB
+broadinstitute/gatk            4.0.5.2             ac9922284463        2 years ago         5.23GB
+lethalfang/vardictjava         1.5.2               1543c61f62a7        2 years ago         851MB
+lethalfang/samtools            1.7                 e1e3febdc57f        2 years ago         234MB
+djordjeklisic/sbg-varscan2     v1                  0a3d079b6bc9        5 years ago         1.17GB
+```
 #### 1.3 Descargar bases de datos externas
 
 La imagen ```labgenomicatumorsec/tumorsec:0.1``` contiene un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/docker/TumorSec ``` de la imagen. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
