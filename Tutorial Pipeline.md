@@ -64,7 +64,7 @@ docker pull lethalfang/strelka:2.9.5
 docker pull lethalfang/vardictjava:1.5.2
 docker pull lethalfang/samtools:1.7
 docker pull djordjeklisic/sbg-varscan2:v1
-dockr pull lethalfang/somaticseq:3.1.1
+docker pull lethalfang/somaticseq:3.1.1
 ```
 
 Revisamos las imagenes disponibles en el host.
