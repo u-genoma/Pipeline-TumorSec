@@ -25,9 +25,9 @@ import csv # to import csv files
 import sys
 plt.switch_backend('agg')
 
-
 def sort_dataframe(df_input): 
     df_input[['aux_nombre','orden']] = df_input['Sample'].str.split('_S',expand=True)
+    df_input["orden"] = pd.to_numeric(df_input["orden"])
     df_input=df_input.sort_values(by='orden', ascending=True)
     df_input.set_index('orden',inplace=True)
     df_input.reset_index(inplace=True)
@@ -248,7 +248,13 @@ def main():
         	pdf.cell(23, 5, '%.2f' % (merge_df_metrics['pct_400X'][i]), 1, 0, 'C')
         	pdf.cell(23, 5, '%.2f' % (merge_df_metrics['pct_500X'][i]), 1, 2, 'C')
         	pdf.cell(-161)	
-        pdf.ln(20)
+        pdf.ln(5)
+        pdf.set_font('arial', '', 8)
+        pdf.cell(120, 5,"Métricas de cobertura de regiones blanco agrupadas por gen para una muestra. Gen: gen blanco. Max coverage: máximo de cobertura del gen", 0, 2, 'L')
+        pdf.cell(120, 5,"Min_coverage: cobertura mínima del gen. Length: número de pares de bases de la regiones blanco del gen. Mean coverage: promedio de cobertura", 0, 2, 'L')
+        pdf.cell(120, 5,"pct 300X: porcentaje de la región con al menos 300X. pct 400X: porcentaje de la región con al menos 400X. pct 500X: porcentaje de la región con", 0, 2, 'L')
+        pdf.cell(120, 5,"al menos 500X", 0, 2, 'L')
+
         pdf.add_page()
         pdf.set_xy(0,0)
         pdf.set_font('arial', 'B', 12)
@@ -258,7 +264,16 @@ def main():
         pdf.cell(100, 10, "Cobertura por region target: Muestra "+sample, 0, 2, 'L') 
         pdf.cell(-40)
         pdf.ln(5)
-        pdf.image(output_plots+'/'+sample+'_coverage_by_targets_region.png', x = None, y = None, w = 180, h = 230, type = 'png', link = '')
+        pdf.image(output_plots+'/'+sample+'_coverage_by_targets_region.png', x = None, y = None, w = 180, h = 180, type = 'png', link = '')
+        pdf.set_font('arial', '', 8)
+        pdf.cell(120, 5,"Gráfico de cobertura de todas las regiones blanco para una muestra. En el eje Y se observa el porcentaje cubierto de la region blanco y en el eje X", 0, 2, 'L')
+        pdf.cell(120, 5,"la profundidad mínima. La linea punteada, marca el 80% de la region blanco cubierta. Aquellas lineas que se encuentran etiquetadas, corresponden", 0, 2, 'L')
+        pdf.cell(120, 5,"a las regiones bajo 80% a un mínimo de 300X. Aquellos gráficos que no poseen etiquetas, presentan 0 o más de 20 regiones bajo 80% a un mínimo", 0, 2, 'L')
+        pdf.cell(120, 5,"de 300X", 0, 2, 'L')
+
+        pdf.cell
+
+
 
     ## DESCRIPCION DEL HEADER EN EL FINAL DEL REPORTE
     pdf.output(output_pdf+'/Complement_report.pdf', 'F')

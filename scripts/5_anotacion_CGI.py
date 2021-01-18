@@ -45,8 +45,8 @@ def execute_CGI(vcf,output):
                 print('DOWNLOAD RESULTS ----->'+output)
                 print('LOG:')
                 flag=True
-                for dato in resp_logs['logs']:### IMPRIME EL LOG DEL CGI POR PANTALLA
-                    print(dato, end='')
+                for dato in resp_logs['logs']:### IMPRIME EL LOG DEL CGI POR PANTALLA #print(dato, end='')
+                    print(dato)
             else:
                 time.sleep(60)
     ## {'error_code': 403, 'message': 'You have reached the maximum number of jobs permitted. Please, delete one before submitting a new job.'}

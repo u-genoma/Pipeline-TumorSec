@@ -8,7 +8,7 @@
 ###########################
 
 #### LOAD INPUT DATA 
-#PIPELINE_TUMORSEC="/home/egonzalez/workSpace/PipelineTumorSec"
+PIPELINE_TUMORSEC="/home/egonzalez/workSpace/PipelineTumorSec"
 #INPUT_DATA="${PIPELINE_TUMORSEC}/00.inputs_TumorSec.ini"
 
 abort()
@@ -56,24 +56,50 @@ while (( "$#" )); do
       ;;
   esac
 done
+
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
 
-source $INPUT_DATA
+if [ -z "$INDIR" ]; then
+	echo ""
+	echo "Enter the output directory:"
+	read INDIR
+fi
+
+if [ -z "$BASESPACE" ]; then
+	echo ""
+	echo "Enter the BaseSpace directory:"
+	read BASESPACE
+fi
+
+if [ -z "$INPUT_DATA" ]; then
+	echo ""
+	echo "Enter input parameters (path) or by default (0):"
+	read INPUT_DATA
+fi
+	
+#### CARGAR VARIABLES Y DATOS DE ENTRADA 
+if [ "$INPUT_DATA" -eq 0 ]; then
+
+    INPUT_DATA="${PIPELINE_TUMORSEC}/00.inputs_TumorSec.ini"
+	source $INPUT_DATA
+else 
+	source $INPUT_DATA
+fi
 
     cd "${INDIR}/${FASTQ}"
-	SAMPLES=$(ls *R1_*.fastq.gz| awk '{split($0,array,"_")} {print array[1]"_"array[2]}')
+	SAMPLES=$(printf "%s\n" *R1*.fastq.gz| awk '{split($0,array,"_")} {print array[1]"_"array[2]}')
+	
 
-	 
 #################################
 #                               #
 #            FASTQC             #
 #################################
-	
+<<HOLA
 	cd "${INDIR}/${FASTQ}"
 
-	zcat *L001_R1_001.fastq.gz > ALL_SAMPLES_L001_R1_001.fastq
-	zcat *L001_R2_001.fastq.gz > ALL_SAMPLES_L001_R2_001.fastq
+	zcat *_R1_001.fastq.gz > ALL_SAMPLES_L001_R1_001.fastq
+	zcat *_R2_001.fastq.gz > ALL_SAMPLES_L001_R2_001.fastq
 	
 	fastqc ALL_SAMPLES_L001_R1_001.fastq
 	fastqc ALL_SAMPLES_L001_R2_001.fastq
@@ -83,7 +109,10 @@ source $INPUT_DATA
 	
 	rm ALL_SAMPLES_L001_R1_001_fastqc.zip
 	rm ALL_SAMPLES_L001_R2_001_fastqc.zip
-	
+
+
+
+
 ###########################################
 #                                         #
 #   QUALIMAP, MOSDEPTH, PICARD, SAMTOOLS  #
@@ -97,9 +126,9 @@ source $INPUT_DATA
 		output_mosdepth="${INDIR}/${DEDUP}/${sample}.mosdepth"
 		output_ontarget="${INDIR}/${DEDUP}/${sample}.ontarget.txt"
 		output_per_target_cov="${INDIR}/${DEDUP}/${sample}.target_coverage.txt"
-                
+               
         # QUALITY OF MAPPING (qualimap) #
-        qualimap bamqc -bam $dedup_resorted_bam \
+        qualimap bamqc -bam $dedup_resorted_bam --java-mem-size=10G \
         -gff $qualimap_targets \
         -outdir $output_qualimap &
 
@@ -116,6 +145,7 @@ source $INPUT_DATA
 
 		intersectBed -a $dedup_resorted_bam -b $HG19_OncoChile_bed | samtools view -c - > $output_ontarget
 		samtools view -c $dedup_resorted_bam >> $output_ontarget
+
 	done
 
 ##############
@@ -125,7 +155,9 @@ source $INPUT_DATA
 
         # MERGE OF REPORTS (multiqc)#
         cd ${INDIR}
-        multiqc -f "${INDIR}" -p 
+        docker run -ti -v "${INDIR}":/mnt ewels/multiqc:1.8 multiqc -f /mnt/ -p
+        #multiqc -f "${INDIR}" -p 
+HOLA
 
 #####################################
 #                                   #
@@ -154,22 +186,25 @@ source $INPUT_DATA
                 echo "the ${INDIR}/${OUTPUT_COV_TARGET} directory alredy exists"
         fi
 
-        
+
+
 #####################################
 #                              		# 
 #  INTEROP (QUALITY OF SEQUENCING)  #
 #####################################
 
-		cd "${INDIR}/${OUTPUT_COV_TARGET}" 
-		interop_summary "${BASESPACE}/Files" > interop_summary.tsv
+		cd "${INDIR}/${OUTPUT_COV_TARGET}" #"${BASESPACE}/Files"
+		interop_summary "${BASESPACE}/Files" | grep -v "^#" | grep -v "Files" | head -n 6 | awk '{ gsub (" ", "", $0); print}' > interop_summary.csv
+		interop_summary "${BASESPACE}/Files" | grep -A 6 "Lane" | awk '{ gsub (" ", "", $0); print}' | egrep -v "Read[1-3]" | head -n 12 | awk -F "," '{print $4","$5","$6}' > interop_summary2.csv
 		cd "${INDIR}/${PLOTS}"
 		interop_plot_qscore_histogram "${BASESPACE}/Files" | gnuplot ##histogram
 		interop_plot_qscore_heatmap "${BASESPACE}/Files"| gnuplot
-		interop_plot_by_lane "${BASESPACE}/Files" | gnuplot
+		interop_plot_by_lane "${BASESPACE}/Files" --metric-name=Clusters| gnuplot
 		interop_plot_by_cycle "${BASESPACE}/Files" | gnuplot
 		 
 		#DESMONTAR BASEMOUNT 
 		#basemount --unmount $BASEMOUNT_DIR
+
 
 #####################################
 #                                   #
@@ -190,28 +225,25 @@ source $INPUT_DATA
 			Rscript $BY_REGION_PLOT $INPUT $OUTPUT $sample $OUTPUT_CSV
 		done
 
-		
-		I="${INDIR}/${OUTPUT_COV_TARGET}/*_400X.csv"
-		O="${INDIR}/${OUTPUT_COV_TARGET}/ALL_SAMPLES_400X.csv"
-		
+		I="${INDIR}/${OUTPUT_COV_TARGET}/*_300X.csv"
+		O="${INDIR}/${OUTPUT_COV_TARGET}/ALL_SAMPLES_300X.csv"
 		
 		if [ -f $O ]; then
     		rm $O
 		fi
 		
 		cat $I > $O
-		
         ######## COMPLEMENT REPORT 
         python $COMPLEMENT_REPORT -i $INDIR/$DEDUP -s $SAMPLES -opdf $INDIR/$REPORT -ocov $INDIR/$OUTPUT_COV_TARGET -l $LOGO -m $INDIR/$PLOTS
 
         ######## GENERATE REPORT OF RUN, WITH THE TABLES AND PLOTS
         echo "python $GENERAL_REPORT -i $INDIR -s $SAMPLES -opdf $INDIR/$REPORT -ocov $INDIR/$OUTPUT_COV_TARGET -l $LOGO -m $INDIR/$PLOTS"
         python $GENERAL_REPORT -i $INDIR -s $SAMPLES -opdf $INDIR/$REPORT -ocov $INDIR/$OUTPUT_COV_TARGET -l $LOGO -m $INDIR/$PLOTS -kit $KIT_SEC
-                 
+
 trap : 0
 
 echo >&2 '
-************
-*** DONE *** 
-************
+##############
+DONE-TumorSec 
+##############
 '

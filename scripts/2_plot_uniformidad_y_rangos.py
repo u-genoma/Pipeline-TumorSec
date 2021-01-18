@@ -21,6 +21,7 @@ list_uniformity=[]
 def sort_dataframe(df_input): 
 	 print(df_input)
 	 df_input[['aux_nombre','orden']] = df_input['Sample'].str.split('_S',expand=True)
+	 df_input["orden"] = pd.to_numeric(df_input["orden"])
 	 df_input=df_input.sort_values(by='orden', ascending=True)
 	 df_input.set_index('orden',inplace=True)
 	 df_input.reset_index(inplace=True)

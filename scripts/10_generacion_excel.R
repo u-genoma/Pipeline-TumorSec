@@ -17,6 +17,9 @@
 #
 ############################
 library(writexl)
+library(tidyr)
+library(maftools)
+
 
 #options(echo=TRUE) # if you want see commands in output file
 args <- commandArgs(trailingOnly = TRUE)
@@ -27,25 +30,53 @@ mutation_analisys_file=args[3]
 regions_target_file=args[4]
 output=args[5]
 
-#annovar_multiano="/Users/evelin/Desktop/Reporte_Variantes/190617_TumorSec/9_annotate/PUCOv013_S1.annovar.hg19_multianno.txt"
-#drug_rescrption_file="/Users/evelin/Desktop/Reporte_Variantes/190617_TumorSec/11_CGI/PUCOv013_S1/drug_prescription.tsv"
-#mutation_analisys_file="/Users/evelin/Desktop/Reporte_Variantes/190617_TumorSec/11_CGI/PUCOv013_S1/mutation_analysis.tsv"
-#regions_target_file="/Users/evelin/Desktop/Reporte_Variantes/190617_TumorSec/4_dedup/PUCOv013_S1.mosdepth.regions.bed.gz"
-#output="/Users/evelin/Desktop/Reporte_Variantes/190617_TumorSec/12_variants_report/excel/PUCOv013_S1.xlsx"
+#annovar_multiano="/Users/evelin/Dropbox/R-plots/Excel_reporte/1590TFFPE_S1.annovar.hg19_multianno.txt"
+#drug_rescrption_file="/Users/evelin/Dropbox/R-plots/Excel_reporte/drug_prescription.tsv"
+#mutation_analisys_file="/Users/evelin/Dropbox/R-plots/Excel_reporte/mutation_analysis_rename.tsv"
+#regions_target_file="/Users/evelin/Dropbox/R-plots/Excel_reporte/1590TFFPE_S1_by_target_region.csv"
+#output="/Users/evelin/Dropbox/R-plots/Excel_reporte/1590TFFPE.xlsx"
 
-mutation_analysis <- read.csv(file=mutation_analisys_file, header=TRUE, sep ='\t')
-drug_prescription <- read.csv(file=drug_rescrption_file, header=TRUE, sep ='\t')
-targets_regions <- read.csv(file=regions_target_file, header=TRUE, sep =',')
-annovar <- read.csv(file=annovar_multiano, header=TRUE, sep =',') ### INPUT VCF, PROCESAR CON MAFTOOLS.
-#names(targets_regions) <- c("CHR","POS_INI","POS_END","REGION","MEAN_COVERAGE")
+mutation_analysis <- read.table(file=mutation_analisys_file, header=TRUE, sep ='\t', check.names = FALSE)
+colnames(mutation_analysis) <- make.unique(names(mutation_analysis))
 
-mutation_analysis$FILTER<-NULL
+
+drug_prescription <- read.table(file=drug_rescrption_file, header=TRUE, sep ='\t')
+targets_regions <- read.table(file=regions_target_file, header=TRUE, sep =',')
+
 mutation_analysis$FORMAT<-NULL
 mutation_analysis$ID<-NULL
-mutation_analysis$INFO<-NULL
 mutation_analysis$QUAL<-NULL
-mutation_analysis$TUMOR<-NULL
+
+mutation_analysis <- mutation_analysis %>% separate(TUMOR, c("GT","DP4","CD4","refMQ","altMQ","refBQ","altBQ","refNM","altNM","fetSB","fetCD","zMQ","zBQ","MQ0","VAF"),"[:]")
+mutation_analysis <- mutation_analysis %>% separate(DP4 , c("DP_REF1","DP_REF2","DP_ALT1", "DP_ALT2"), "[,]")
+mutation_analysis <- mutation_analysis %>% separate(INFO, c("AF","MVDLPK","NUM_TOOLS"), "[;]")
+mutation_analysis$AF<- gsub('AF=','', mutation_analysis$AF)
+mutation_analysis$MVDLPK<- gsub('MVDLPK=','', mutation_analysis$MVDLPK)
+mutation_analysis$MVDLPK<- gsub('MVDLK=','', mutation_analysis$MVDLPK)
+mutation_analysis$NUM_TOOLS<- gsub('NUM_TOOLS=','', mutation_analysis$NUM_TOOLS)
 
 drug_prescription$SAMPLE <- NULL ### ELIMINAMOS COLUMNA SAMPLE 1_PDF_report 2_plots_and_tables 3_excel
-sheets <- list("1_annovar_annotation"=annovar,"2_mutation_analysis" = mutation_analysis, "3_drug_prescription" = drug_prescription, "4_targets_regions" = targets_regions) #assume sheet1 and sheet2 are data frames
+
+var.annovar.maf <- annovarToMaf(annovar =annovar_multiano, Center = 'CSI-NUS', refBuild = 'hg19',tsbCol = 'Tumor_Sample_Barcode', table = 'refGene')
+colnames(var.annovar.maf) <- make.unique(names(var.annovar.maf))
+var.annovar.maf <- var.annovar.maf %>% separate(V144, c("GT","DP4","CD4","refMQ","altMQ","refBQ","altBQ","refNM","altNM","fetSB","fetCD","zMQ","zBQ","MQ0","VAF"),"[:]")
+var.annovar.maf <- var.annovar.maf %>% separate(DP4 , c("DP_REF1","DP_REF2","DP_ALT1", "DP_ALT2"), "[,]")
+var.annovar.maf$DP_ALT<-as.numeric(var.annovar.maf$DP_ALT1) + as.numeric(var.annovar.maf$DP_ALT2)
+var.annovar.maf <- var.annovar.maf %>% separate(V142, c("AF","MVDLPK","NUM_TOOLS"), "[;]")
+var.annovar.maf$AF<- gsub('AF=','', var.annovar.maf$AF)
+var.annovar.maf$MVDLPK<- gsub('MVDLPK=','', var.annovar.maf$MVDLPK)
+var.annovar.maf$MVDLPK<- gsub('MVDLK=','', var.annovar.maf$MVDLPK)
+var.annovar.maf$NUM_TOOLS<- gsub('NUM_TOOLS=','',var.annovar.maf$NUM_TOOLS)
+
+#var.annovar.maf$V115<-NULL
+#var.annovar.maf$V116<-NULL
+#var.annovar.maf$V117<-NULL
+#var.annovar.maf$V118<-NULL
+#var.annovar.maf$V119<-NULL
+#var.annovar.maf$V120<-NULL
+#var.annovar.maf$V121<-NULL
+#var.annovar.maf$V122<-NULL
+#var.annovar.maf$V125<-NULL
+
+sheets <- list("1_ANNOVAR"=var.annovar.maf,"2_mutation_analysis" = mutation_analysis, "3_drug_prescription" = drug_prescription, "4_targets_regions" = targets_regions) #assume sheet1 and sheet2 are data frames
 write_xlsx(sheets,output)

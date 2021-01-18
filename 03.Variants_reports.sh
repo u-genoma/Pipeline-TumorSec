@@ -24,7 +24,7 @@ abort()
 
 trap 'abort' 0
 #abort on error
-set -e
+#set -e
 
 PARAMS=""
 echo "1:$#"
@@ -54,7 +54,6 @@ while (( "$#" )); do
 done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
-
 
 source $INPUT_DATA
 
@@ -116,13 +115,22 @@ get_samples
         Rscript $PLOT_DP $INPUT_VCF ${INDIR}/${IMAGES_REPORT}
         
         CGI_OUTPUT="${INDIR}/${CGI}/list_CGI_MA_rename.txt"
+        CGI_ANNOVAR_OUTPUT="${INDIR}/${SUMMARY_OUTPUTS}/Filtered_variantClass-ANNOVAR-CGI.tsv"
+        VAR_GERM="${PIPELINE_TUMORSEC}/complement/List_IDvariante_Germinal_PipelineTumorSec.tsv"
+        CGI_OUTPUT="${INDIR}/${CGI}/list_CGI_MA_rename.txt"
         
-        Rscript $CGI_MAF_ONCOPLOT $CGI_OUTPUT "${INDIR}/${IMAGES_REPORT}/" "${INDIR}/${CGI}"  $AF $ExAC $DP_ALT 
+        find ${INDIR} -name "*mutation_analysis_rename.tsv" > ${CGI_OUTPUT}
+        
+        Rscript $CLASS_FILTER_ANNOVAR_CGI "${INDIR}/${SUMMARY_OUTPUTS}" "${INDIR}/${ANNOVAR_ANOT}" $VAR_GERM "${INDIR}/${EXCEL}/All_samples_clasificacion-variantes.xlsx" $CGI_OUTPUT
+        
+        Rscript $PLOTS_VAR_REPORT $CGI_ANNOVAR_OUTPUT "${INDIR}/${IMAGES_REPORT}"
+
+        Rscript $CGI_MAF_ONCOPLOT $CGI_OUTPUT "${INDIR}/${IMAGES_REPORT}/" "${INDIR}/${CGI}" $AF $ExAC $DP_ALT
         
         #### MAKE PDF WITH THE VARIANTS REPORT
         echo "python $REPORTE_VARIANTES -i ${INDIR} -s $SAMPLES"
         python $REPORTE_VARIANTES -i $INDIR -s $SAMPLES --logo $LOGO --img $INDIR/$IMAGES_REPORT --outputpdf $INDIR/$REPORT_PDF --ocov $INDIR/$SUMMARY_OUTPUTS
-        
+
         #### MAKE EXCEL FILE PER SAMPLE WITH THE INFORMATION OF ANNOVAR, CGI ANNOTATION AND REGION TARGETS COVERAGE
         for sample in $SAMPLES
 		do
@@ -135,15 +143,15 @@ get_samples
 			EXCEL_OUTPUT="${INDIR}/${EXCEL}/${sample}.xlsx"
 		
 			#echo"Rscript $CSV_ANNOVAR $INPUT_VCF $INPUT_TXT $CSV_OUTPUT"
-        	Rscript $CSV_ANNOVAR $INPUT_VCF $INPUT_TXT $CSV_OUTPUT
-        	echo "Rscript $MAKE_EXCEL $CSV_OUTPUT $CGI_DRUG_PRESC $CGI_MUTATION $TARGET_FILE"
-        	Rscript $MAKE_EXCEL $CSV_OUTPUT $CGI_DRUG_PRESC $CGI_MUTATION $TARGET_FILE $EXCEL_OUTPUT
+        	#Rscript $CSV_ANNOVAR $INPUT_VCF $INPUT_TXT $CSV_OUTPUT
+        	echo "Rscript $MAKE_EXCEL $INPUT_TXT $CGI_DRUG_PRESC $CGI_MUTATION $TARGET_FILE"
+        	Rscript $MAKE_EXCEL $INPUT_TXT $CGI_DRUG_PRESC $CGI_MUTATION $TARGET_FILE $EXCEL_OUTPUT
         done
         
 trap : 0
 
 echo >&2 '
-************
-*** DONE *** 
-************
+##############
+DONE-TumorSec 
+##############
 '

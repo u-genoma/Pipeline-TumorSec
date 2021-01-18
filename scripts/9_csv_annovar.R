@@ -19,6 +19,7 @@ output=args[3]
 vcf <- vcfR::read.vcfR(input_vcf, verbose = FALSE)
 
 var.annovar.maf <- annovarToMaf(annovar =input_txt, Center = 'CSI-NUS', refBuild = 'hg19',tsbCol = 'Tumor_Sample_Barcode', table = 'refGene')
+colnames(var.annovar.maf) <- make.unique(names(var.annovar.maf))
 
 #Parse DP from the gt region.
 #dp <- extract.gt(vcf, element='DP4', as.list(TRUE))
@@ -83,7 +84,7 @@ total_ANNOVAR$V97<-NULL
 total_ANNOVAR$V98<-NULL
 total_ANNOVAR$V99<-NULL
 total_ANNOVAR$V100<-NULL
-
+print(total_ANNOVAR)
 write.csv(total_ANNOVAR,output)
 
 

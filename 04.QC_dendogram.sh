@@ -20,13 +20,14 @@
 ############################
 
 ### INPUTS
-#GATK="/opt/GenomeAnalysisTK.jar"
-#hg19_fa="/datos/reference/Inputs_TumorSec/genome/hg19.fa"
-#dbsnp_138_hg19="/datos/reference/Inputs_TumorSec/genome/dbsnp_138.hg19.vcf"
+GATK="/opt/GenomeAnalysisTK.jar"
+hg19_fa="/datos/reference/Inputs_TumorSec/genome/hg19.fa"
+dbsnp_138_hg19="/datos/reference/Inputs_TumorSec/genome/dbsnp_138.hg19.vcf"
 #HG19_OncoChile_bed="/datos/reference/Inputs_TumorSec/targets/180420_HG19_OncoChile_v1_EZ_primary_targets.bed"
-#PICARD="/opt/picard.jar"
-#TABULAR_GENOTIPOS="/home/egonzalez/workSpace/scripts/tabular_genotipos.py"
-
+HG19_OncoChile_bed="/home/egonzalez/workSpace/work_2020/03-09-20_Dendograma_TruSeq_TumorSec_germinal/0_beds/intersect_truseq_tumorsec.bed"
+PICARD="/opt/picard.jar"
+TABULAR_GENOTIPOS="/home/egonzalez/workSpace/PipelineTumorSec/scripts/tabular_genotipos.py"
+GENERATE_DENDOGRAM="/home/egonzalez/workSpace/PipelineTumorSec/scripts/fix_genotypes_for_comparison_v2.R"
 
 ## OUTPUT DIRECTORY
 HC="1_haplotypecaller"
@@ -50,64 +51,110 @@ trap 'abort' 0
 set -e
 
 PARAMS=""
-echo "1:$#"
+#echo "1:$#"
 while (( "$#" )); do
   case "$1" in
      -o|--output-dir)
       shift&&OUTDIR=$1
-      echo "2:$#"
+      #echo "2:$#"
       ;;
      -l|--list-bam)
        shift&&BAM=$1
-       echo "3:$#"
+       #echo "3:$#"
       ;;
      -dp|--depth)
        shift&&DP=$1
-       echo "3:$#"
+       #echo "3:$#"
       ;;
       -gs|--pct-gt-samples)
        shift&&PCT_GT_SAMPLES=$1 ## Porcentaje de genotipado por 50% por muestra
-       echo "3:$#"
+       #echo "3:$#"
       ;;
       -maf|--maf)
        shift&&MAF=$1 ## Mínimo de frecuencia alélica del 5% para cada RSID
-       echo "3:$#"
+       #echo "3:$#"
        ;;
       -gm|--pct-gt-snv) ## Porcentaje de genotipado del 90% por SNV (RSID).
        shift&&PCT_GT_SNV=$1
-       echo "3:$#"
+       #echo "3:$#"
        ;;
-       -e|--input--data)
-       shift&&INPUT_DATA=$1
-       #echo "6:$#"
+    --) # end argument parsing
+      shift
+      break
       ;;
-       --) # end argument parsing
-       shift
-       break
-       ;;
-       -*|--*=) # unsupported flags
-       echo "Error: Unsupported flag $1" >&2
-       exit 1
-       ;;
-       *) # preserve positional arguments
-       PARAMS="$PARAMS $1"
-       shift
-       ;;
-    esac
+    -*|--*=) # unsupported flags
+      echo "Error: Unsupported flag $1" >&3
+      exit 1
+      ;;
+    *) # preserve positional arguments
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
 done
 # set positional arguments in their proper place
 eval set -- "$PARAMS"
 
+if [ -z "$OUTDIR" ]; then
+	echo ""
+	echo "Enter the output directory:"
+	read OUTDIR
+fi
+
+if [ -z "$BAM" ]; then
+	echo ""
+	echo "Enter list of bam files:"
+	read BAM
+fi
+
+if [ -z "$DP" ]; then	
+	echo ""
+	echo "Enter DP filter:"
+	read DP
+fi
+
+if [ -z "$PCT_GT_SAMPLES" ]; then
+	echo ""
+	echo "Enter %GT por muestra:"
+	read PCT_GT_SAMPLES
+fi
+
+if [ -z "$MAF" ]; then
+	echo ""
+	echo "Enter MAF filter:"
+	read MAF
+fi
+
+if [ -z "$PCT_GT_SNV" ]; then
+	echo ""
+	echo "Enter %GT por SNV:"
+	read PCT_GT_SNV
+fi
+
 
 FILES_BAM=$(cat $BAM )
 
-source $INPUT_DATA
-<<HOLA
+#source $INPUT_DATA
+#HG19_OncoChile_bed="/datos/reference/Inputs_TumorSec/targets/TruSeq_Targets.bed"
+DP="50"
+
+## agregar log por paso. (funcion), cambiar entrada de pasos. agregar comandos al log. poner tiempo por paso ejecutado.
+echo ""
+echo "############################################"
+echo "     Welcome to the dendogram pipeline      "
+echo "############################################"
+echo ""
+echo "== calculate manhattan distance between samples =="
+echo "Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile"
+echo ""
+echo "Comando: sh 04.QC_dendogram.sh -l /path/to/list_of_bam.txt -o path/to/output/directory -dp 250 -maf 0.05 -gm 0.5 -gs 0.8" 
+echo "" 
+
 ####################################################
 #                                                  #
 # 1. RUN HAPLOTYPECALLER (GATK) AND RUN DP FILTER  #
 ####################################################
-
+<<HOLA
 if [ ! -d "${OUTDIR}/${HC}" ]; then
                 mkdir "${OUTDIR}/${HC}"
         else
@@ -164,7 +211,7 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
                 echo "The ${OUTDIR}/${VCF} directory alredy exists"
         fi
         
-        #rm "$OUTDIR/$VCF/comand_merge_all_gVCF.sh"
+     	#rm "$OUTDIR/$VCF/comand_merge_all_gVCF.sh"
         
         echo "java -jar $GATK -T GenotypeGVCFs -R $hg19_fa \\" > "$OUTDIR/$VCF/comand_merge_all_gVCF.sh"
         cd "${OUTDIR}/${HC}"
@@ -200,7 +247,7 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 			-V $ALL_SAMPLES_VCF \
 			--dbsnp $dbsnp_138_hg19 \
 			--out $ALL_SAMPLES_VCF_ANNOTATED 		
-
+HOLA
 #############################################
 #                                           #
 # 4. SELECT INDELS AND DELETE MULTIALLELIC  #
@@ -246,14 +293,14 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 
 	   
 ######################################
-#                                    #
+#                                    # se cambio a mayor a 0
 # 7. DELETE RSID WITH MAF < 0.05     #
 ######################################	   
 
   ## make list of rdID to Delete for MAF filter
   #DELETE RSID
   
-        cat ${OUTDIR}/${PLINK}/freq_counts.frq | awk '{if($5<0.05) print $2}' > ${OUTDIR}/${VCF}/list_vcf_exclude.txt
+        cat ${OUTDIR}/${PLINK}/freq_counts.frq | awk '{if($5<0) print $2}' > ${OUTDIR}/${VCF}/list_vcf_exclude.txt
         
         OUTPUT_VCF="${OUTDIR}/${VCF}/5_all_samples_annotated_only_RSID_MAF.vcf"
         FINAL_VCF="${OUTDIR}/${VCF}/4_all_samples_annotated_only_RSID.vcf"
@@ -274,8 +321,9 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
 #                              #
 # 8. CREATE GENOTYPE MATRIZ    #
 ################################
-		source activate $PYTHON2_ENV
-		python $TABULAR_GENOTIPOS ${OUTDIR}/${PLINK}/all_samples.ped > ${OUTDIR}/${PLINK}/SETPLINK.tsv
+
+		#source activate $PYTHON2_ENV
+		python2.7 $TABULAR_GENOTIPOS ${OUTDIR}/${PLINK}/all_samples.ped > ${OUTDIR}/${PLINK}/SETPLINK.tsv
 		awk '{print $2}' ${OUTDIR}/${PLINK}/all_samples.map | awk '{ORS=(NR?FS:RS)}1' | awk -v OFS="\t" '$1=$1' | awk '{print "Sample\t"$0}' > ${OUTDIR}/${PLINK}/SETPLINK.head
 
 		cat ${OUTDIR}/${PLINK}/SETPLINK.head > ${OUTDIR}/${PLINK}/SETPLINK_2.tsv
@@ -283,7 +331,7 @@ if [ ! -d "${OUTDIR}/${VCF}" ]; then
         
         ### remplazar 00 por 0 en la matriz
         cat ${OUTDIR}/${PLINK}/SETPLINK_2.tsv | sed 's/00/0/g' > ${OUTDIR}/${PLINK}/SETPLINK_3.tsv
-HOLA
+
 #####################################
 #                                   #
 # 9. CREATE DENDOGRAM  AND PLOTS    #
@@ -298,7 +346,7 @@ HOLA
         echo "Rscript $GENERATE_DENDOGRAM ${OUTDIR}/${PLINK}/SETPLINK_3.tsv $PCT_GT_SNV $PCT_GT_SAMPLES ${OUTDIR}/${DENDO}"
         Rscript $GENERATE_DENDOGRAM ${OUTDIR}/${PLINK}/SETPLINK_3.tsv $PCT_GT_SNV $PCT_GT_SAMPLES ${OUTDIR}/${DENDO}
         
-end_log "QC-Report-1" "quality-metrics"
+#end_log "QC-Report-1" "quality-metrics"
 
 echo "$(date) : step QC-Report-2 - finished - dendogram" >&3
 
@@ -306,7 +354,7 @@ echo "$(date) : step QC-Report-2 - finished - dendogram" >&3
 trap : 0
 
 echo >&2 '
-************
-*** DONE *** 
-************
+##############
+DONE-TumorSec 
+##############
 '

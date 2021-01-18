@@ -87,8 +87,8 @@ OUTPUT_ID_FFPE="${OUTPUT}/DUO_${name_FFPE}/${name_FFPE}_${AF}_1_filter_ID_CGI.ts
 OUTPUT_ID_TF="${OUTPUT}/DUO_${name_FFPE}/${name_TF}_${AF}_2_filter_ID_CGI.tsv"
 
     ##### Filtro de variantes por frecuencia alélica. DP_ALT>12 sin AF en ExAC, y variantes con cambio a nivel de proteina.  # $13!="Synonymous" 
-	cat $FFPE | awk -F "\t" '{print $7"\t"$0}'| awk -F ":" '{if ($15 > "'$AF'") print $0}' |  awk -F ":" '{print $2","$0}'| awk -F "," '{if(($3+$4) >= 12) print $0}' | awk -F '\t' '{if($21=="" || $21 < 0.01){print $0}}' | awk -F "\t" '{if($45!=".") print $28":"$1}'| awk -F ":" '{print $1" "$16}' > $OUTPUT_ID_FFPE
-	cat $TF | awk -F "\t" '{print $7"\t"$0}'| awk -F ":" '{if ($15 > "'$AF'" ) print $0}' |  awk -F ":" '{print $2","$0}'| awk -F "," '{if(($3+$4) >= 12) print $0}' | awk -F '\t' '{if($21=="" || $21 < 0.01){print $0}}' | awk -F "\t" '{if($45!=".") print $28":"$1}' | awk -F ":" '{print $1" "$16}' > $OUTPUT_ID_TF
+	cat $FFPE | awk -F "\t" '{print $7"\t"$0}'| awk -F ":" '{if ($15 > "'$AF'") print $0}' |  awk -F ":" '{print $2","$0}'| awk -F "," '{print $0}' | awk -F '\t' '{print $0}' | awk -F "\t" '{print $28":"$1}'| awk -F ":" '{print $1" "$16}' > $OUTPUT_ID_FFPE
+	cat $TF | awk -F "\t" '{print $7"\t"$0}'| awk -F ":" '{if ($15 > "'$AF'" ) print $0}' |  awk -F ":" '{print $2","$0}'| awk -F "," '{print $0}' | awk -F '\t' '{print $0}' | awk -F "\t" '{print $28":"$1}' | awk -F ":" '{print $1" "$16}' > $OUTPUT_ID_TF
 
 echo "Archivos del trio"
 echo $OUTPUT_ID_FFPE

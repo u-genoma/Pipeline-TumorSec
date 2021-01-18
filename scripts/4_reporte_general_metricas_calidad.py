@@ -3,11 +3,7 @@
 #  26/06/2019
 #  EVELIN GONZALEZ FELIU
 #  DESCRIPCION:
-#
-#
 # python Reporte_190607.py -i /Users/evelin/Documents/190617_TumorSec
-# -s PUCOv013_S1 PUCOv014_S2 PUCOv015_S3 PUCOv016_S4 PUCOv017_S5 PUCOv018_S6 PUCOv019_S7 PUCOv020_S8
-#
 ######################################
 
 import numpy as np
@@ -29,6 +25,7 @@ import argparse
 
 def sort_dataframe(df_input): 
     df_input[['aux_nombre','orden']] = df_input['Sample'].str.split('_S',expand=True)
+    df_input["orden"] = pd.to_numeric(df_input["orden"])
     df_input=df_input.sort_values(by='orden', ascending=True)
     df_input.set_index('orden',inplace=True)
     df_input.reset_index(inplace=True)
@@ -148,7 +145,6 @@ def mean_coverage(output_plots,df_merge3,color):
         plt.clf()
         print("Grafico del promedio de cobertura en regiones targets por muestra ---> LISTO !!")
 
-
 def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metric_linea,df_merge3,df_HsMetrics,df_400X,logo,output_plots):
     pdf = FPDF()
     pdf.add_page()
@@ -177,11 +173,13 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
         pdf.cell(-50)
     pdf.cell(120, 5,"Tabla 1: Información del kit de secuenciación y regiones blanco de TumorSec", 0, 2, 'L')
     pdf.ln(3)
-    pdf.image(output_plots+'/Files_ClusterCount-by-lane.png', x = None, y = None, w = 58, h = 58, type = 'png', link = '')
+    pdf.image(output_plots+'/Files_Clusters-by-lane.png', x = None, y = None, w = 58, h = 58, type = 'png', link = '')
     pdf.image(output_plots+'/Files_Intensity-by-cycle_Intensity.png', x = 80, y = 148, w = 58, h = 58, type = 'png', link = '')
     pdf.image(output_plots+'/Files_q-heat-map.png', x = None, y = None, w = 58, h = 58, type = 'png', link = '')
     pdf.image(output_plots+'/Files_q-histogram.png', x = 80, y = 206, w = 58, h = 58, type = 'png', link = '')
-    pdf.cell(120, 5,"Imagen 1: Métricas de BaseSpace Illumina MiSeq.", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 1: Métricas de BaseSpace Illumina MiSeq. A: Densidad de clusters (K/mm2) por línea. B: Gráfico de intensidad por ciclo.", 0, 1, 'L')
+    pdf.cell(120, 5,"C: Gráfico de score de calidad por ciclo. D: Diagrama de distribución de QScore, número de bases por score de calidad", 0, 1, 'L')
+
 
     #############  PAGINA 2 ############################################
     pdf.add_page()
@@ -196,20 +194,20 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.cell(75, 10, "2.1.- Métricas según Lecturas:", 0, 2,'L')## REPORTE DE LA PODA DE DATOS.
     pdf.set_font('arial', '', 8)
     pdf.cell(30, 5, 'Read', 1, 0, 'L')
-    pdf.cell(30, 5, 'Ciclos', 1, 0, 'L')
-    pdf.cell(30, 5, 'Rendimiento', 1, 0, 'L')
-    pdf.cell(30, 5, 'Rend Esperado', 1, 0, 'L')
-    pdf.cell(30, 5, '%Q30', 1, 0, 'L')
+    pdf.cell(30, 5, 'Rendimiento (Gb)', 1, 0, 'L')
+    pdf.cell(30, 5, 'Rend Esperado (Gb)', 1, 0, 'L')
+    pdf.cell(30, 5, 'Intensidad', 1, 0, 'L')
+    pdf.cell(30, 5, '%>=Q30', 1, 0, 'L')
     pdf.cell(30, 5, 'Phas/Prephas (%)', 1, 2, 'L')
     pdf.cell(-150)
     for i in range(0, len(df_metric_lect)):
         print(i)
-        pdf.cell(30, 5, '%s' % (str(df_metric_lect['READ'][i])), 1, 0, 'L')
-        pdf.cell(30, 5, '%s' % (str(df_metric_lect['CYCLES'][i])), 1, 0, 'L')
-        pdf.cell(30, 5, '%s' % (str(df_metric_lect['YIELD'][i])), 1, 0, 'L')
-        pdf.cell(30, 5, '%s' % (str(df_metric_lect['PROJECTED'][i])), 1, 0, 'L')
-        pdf.cell(30, 5, '%s' % (str(df_metric_lect['Q30'][i])), 1, 0, 'L')
-        pdf.cell(30, 5, '%s' % (str(df_metric_lect['Phas_Prephas'][i])), 1, 2, 'L')
+        pdf.cell(30, 5, '%s' % (str(df_metric_lect['Level'][i])), 1, 0, 'L')
+        pdf.cell(30, 5, '%s' % (str(df_metric_lect['Yield'][i])), 1, 0, 'L')
+        pdf.cell(30, 5, '%s' % (str(df_metric_lect['ProjectedYield'][i])), 1, 0, 'L')
+        pdf.cell(30, 5, '%s' % (str(df_metric_lect['IntensityC1'][i])), 1, 0, 'L')
+        pdf.cell(30, 5, '%s' % (str(df_metric_lect['%>=Q30'][i])), 1, 0, 'L')
+        pdf.cell(30, 5, '%s' % (str(df_metric_lect['LegacyPhasing/PrephasingRate'][i])), 1, 2, 'L')
         pdf.cell(-150)
     pdf.cell(120, 5,"Tabla 2: Métricas de las lecturas de BaseSpace Illumina", 0, 2, 'L')
     pdf.set_font('arial', '', 10)
@@ -219,9 +217,9 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.cell(30, 5, 'Densidad (K/mm2)', 1, 0, 'L')
     pdf.cell(30, 5, 'Clúster PF (%)', 1, 2, 'L')
     pdf.cell(-60)
-    pdf.cell(30, 5, '%s' % (str(df_metric_linea['Linea'][0])), 1, 0, 'L')
-    pdf.cell(30, 5, '%s' % (str(df_metric_linea['Densidad'][0])), 1, 0, 'L')
-    pdf.cell(30, 5, '%s' % (str(df_metric_linea['Cluster'][0])), 1, 2, 'L')
+    pdf.cell(30, 5, 'Linea 1', 1, 0, 'L')
+    pdf.cell(30, 5, '%s' % (str(df_metric_linea['Density'])), 1, 0, 'L')
+    pdf.cell(30, 5, '%s' % (str(df_metric_linea['ClusterPF'])), 1, 2, 'L')
     pdf.cell(-150)
     pdf.ln(5)
     pdf.set_font('arial', 'B', 12)
@@ -257,7 +255,11 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
         pdf.cell(22, 5, '%.2f' % (df_merge3['pct_unifomity'][i]), 1, 2, 'C')
         pdf.cell(-176)
     pdf.set_font('arial', '', 8)
-    pdf.cell(120, 5,"Tabla 3: Métricas de cobertura en regiones targets", 0, 2, 'L')
+    pdf.cell(120, 5,"Tabla 3: Métricas de calidad. Sample: Muestras. R_before trimming: Número de lecturas iniciales. R_after_trimming: Número de lecturas despues de la poda", 0, 2, 'L')
+    pdf.cell(120, 5,".% of trim : Porcentaje de lecturas eliminadas. % of dups: Porcentaje de lecturas duplicadas. Reads On-Target: Número de lecturas en regiones blanco", 0, 2, 'L')
+    pdf.cell(120, 5,"% On-Target: Porcentaje en regiones blanco. Mean read coverage: Profundidad promedio de lecturas en regiones blanco. % Uniformity: Porcentaje de lecturas", 0, 2, 'L')
+    pdf.cell(120, 5,"en regiones blanco, donde su profundidad promedio está entre el rango [2* mediana, mediana/2].", 0, 2, 'L')
+
 
     ################# PAGINA 3 #################################################
     pdf.set_xy(0, 0)
@@ -265,7 +267,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.set_y(-15)
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -298,10 +300,10 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
         pdf.cell(20, 5, '%.2f' % (df_HsMetrics['PCT_TARGET_BASES_500X'][i]), 1, 2, 'C')
         pdf.cell(-164)
     pdf.set_font('arial', '', 8)
-    pdf.cell(120, 5,"Tabla 3: Métricas de cobertura en regiones targets", 0, 2, 'L')
+    pdf.cell(120, 5,"Tabla 4: Métricas de cobertura en regiones targets", 0, 2, 'L')
     pdf.ln(5)
     pdf.set_font('arial', 'B', 12)
-    pdf.cell(75, 10, "3.1.3- Amplitud de regiones blanco con cobertura 400X", 0, 2,'L')## REPORTE DE LA PODA DE DATOS
+    pdf.cell(75, 10, "3.1.3- Amplitud de regiones blanco con cobertura mínima de 300X", 0, 2,'L')## REPORTE DE LA PODA DE DATOS
     pdf.ln(5)
     pdf.set_font('arial', 'B', 8)
     pdf.cell(28, 5, 'SAMPLE', 1, 0, 'C')
@@ -323,17 +325,20 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
 
         pdf.cell(-140)
     pdf.set_font('arial', '', 8)
-    pdf.cell(120, 5,"Tabla 4: Número de regiones targets con amplitd menor a 70%, 80%, 90% y 100%, a una cobertura de 400X", 0, 2, 'L')
+    pdf.cell(120, 5,"Tabla 5: Número de regiones blanco que poseen menos del 80% una profundidad mínima de 300X. Estas métricas tambien se observan para un 70%,", 0, 2, 'L')
+    pdf.cell(120, 5,"90% y 100% a un minimo de 300X. Para resultados de mejor calidad, se espera un bajo número de regiones a 80% a un minimo de 300X. El detalle", 0, 2, 'L')
+    pdf.cell(120, 5,"de las regiones blanco se encuentra en los archivos excel y reporte complementario, generados por el pipeline TumorSec", 0, 2, 'L')
+
     pdf.ln(5)
     
-    ################# PÁGINA 4 #################################################
+    ################# PÁGINA 4 ################################################
     pdf.set_xy(0, 0)
     pdf.cell(-40)
     pdf.set_y(-15)
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -346,7 +351,10 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.cell(75, 10, "3.2.- Calidad de bases por posición en fastq R1 y R2 sin filtrar: FASTQC", 0, 2,'L')## REPORTE DE LA PODA DE DATOS.
     pdf.set_font('arial', '', 8)
     pdf.image(path_input+'/1_fastq/ALL_SAMPLES_L001_R1_001_fastqc/Images/per_base_quality.png', x = None, y = None, w = 100, h = 80, type = 'png', link = '')
-    pdf.cell(120, 5,"Imagen 2: Descripción general del rango de valores de calidad para todos los fastq R1 en cada posición.", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 2: Descripción general del los valores de calidad para todos los fastq R1. Se observa un gráfico de cajas con la distribución", 0, 2, 'L')
+    pdf.cell(120, 5,"de las calidades por posición en la lectura. Este gráfico permite observar si los datos tienen algún problema antes de realizar", 0, 2, 'L')
+    pdf.cell(120, 5,"cualquier análisis posterior.", 0, 2, 'L')
+
     pdf.image(path_input+'/1_fastq/ALL_SAMPLES_L001_R2_001_fastqc/Images/per_base_quality.png', x = None, y = None, w = 100, h = 80, type = 'png', link = '')
     pdf.cell(120, 5,"Imagen 3: Descripción general del rango de valores de calidad para todos los fastq R2 en cada posición.", 0, 2, 'L')
    ##### TRIMMING METRICS 
@@ -356,7 +364,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -384,7 +392,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -396,7 +404,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.image(output_plots+'/1quality_reads.png', x = None, y = None, w = 120, h = 80, type = 'png', link = '')
     pdf.cell(120, 5,"Imagen 6: Calidad promedio de lecturas por posición antes del trimming (R2)", 0, 2, 'L')
     pdf.image(output_plots+'/2quality_reads.png', x = None, y = None, w = 120, h = 80, type = 'png', link = '')
-    pdf.cell(120, 5,"Imagen 7:  Calidad promedio de lecturas por posición después del trimming (R1)", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 7: Calidad promedio de lecturas por posición después del trimming (R1)", 0, 2, 'L')
     pdf.image(output_plots+'/3quality_reads.png', x = None, y = None, w = 120, h = 80, type = 'png', link = '')
     pdf.cell(120, 5,"Imagen 8:  Calidad promedio de lecturas por posición después del trimming (R2)", 0, 2, 'L')
     #pdf.cell(120, 5,"Imagen 2: Esta Imagen hay que integrarla al script", 0, 2, 'L')
@@ -408,7 +416,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -421,10 +429,10 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.ln(5)
     pdf.image(output_plots+'/dedup.png', x = None, y = None, w = 100, h = 90, type = 'png', link = '')
     pdf.set_font('arial', '', 8)
-    pdf.cell(120, 5,"Imagen 9: Porcentaje de reads duplicados", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 9: Porcentaje de lecturas duplicadas, estas son marcadas e ignoradas en el llamado de variantes", 0, 2, 'L')
     pdf.ln(10)
     pdf.image(path_input+'/multiqc_plots/png/mqc_qualimap_insert_size_1.png', x = None, y = None, w = 150, h = 50, type = 'png', link = '')
-    pdf.cell(120, 5,"Imagen 10: Histograma del tamaño del inserto. Metricas obtenidas por qualimap", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 10: Histograma de distribución del tamaño del inserto. Métricas obtenidas por qualimap", 0, 2, 'L')
     pdf.ln(10)
 
     #########3.4.- Porcentaje de lecturas on-target y profundidad:
@@ -434,7 +442,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -446,7 +454,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.cell(75, 10, "3.6.- Porcentaje de lecturas on-target y profundidad:", 0, 2,'L')## REPORTE DE LA PODA DE DATOS.
     pdf.image(output_plots+'/pct_reads_ontarget.png', x = None, y = None, w = 100, h = 80, type = 'png', link = '')
     pdf.set_font('arial', '', 8)
-    pdf.cell(120, 5,"Imagen 11: Porcentaje de reads que se encuentran en regiones blancos por muestra", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 11: Porcentaje de lecturas que se encuentran en regiones blancos por muestra", 0, 2, 'L')
     pdf.ln(10)
     pdf.image(output_plots+'/promedio_profundidad.png', x = None, y = None, w = 100, h = 80, type = 'png', link = '')
     pdf.set_font('arial', '', 8)
@@ -459,7 +467,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -477,7 +485,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.cell(120, 5,"Imagen 14: Cantidad de coberturas promedio por rango para cada muestra", 0, 2, 'L')
     pdf.image(output_plots+'/pct_coverage_all.png', x = None, y = None, w = 150, h = 60, type = 'png', link = '')
     pdf.set_font('arial', '', 8)
-    pdf.cell(120, 5,"Imagen 15: porcentaje de bases con cobertura en un rango de 100-1000", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 15: porcentaje de bases con cobertura en un rango de 100X-1000X", 0, 2, 'L')
     pdf.ln(10)
 
     pdf.set_xy(0, 0)
@@ -486,7 +494,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     # Select Arial italic 8
     pdf.set_font('Arial', 'I', 8)
     # Print centered page number
-    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genética del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
+    pdf.cell(0, 10, 'Página %s - TumorSec - Laboratorio de Genómica del Cancer, Universidad de Chile. ' % pdf.page_no(), 0, 2, 'C')
     pdf.set_xy(0, 0)
     pdf.set_font('arial', 'B', 12)
     pdf.ln(10)
@@ -494,9 +502,10 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.ln(15)
     pdf.cell(75, 20, "4. Cobertura de bases por cada gen target ", 0, 2,'L')## REPORTE DE LA PODA DE DATOS
     pdf.set_font('arial', '', 10)
-    pdf.cell(90, 8,"Con el objetivo de poder observar como es la cobertura de reads en regiones targets por gen, se  agruparon los exones", 0, 1, 'L')
-    pdf.cell(90, 8,"blancos de cada gen y se calcularon los porcentajes de bases que poseen una cobertura mayor o igual a 100X, 300X, ", 0, 1, 'L')
-    pdf.cell(90, 8,"400X y 500X. Esta información ademas se encuentra por muestra en el reporte suplementario del pipeline TumorSec.", 0, 1, 'L') 
+    pdf.cell(90, 8,"Cobertura de las regiones blanco por gen. Se  agruparon las regiones blancos por gen target y se calcularon los porcentajes", 0, 1, 'L')
+    pdf.cell(90, 8,"de bases que poseen una cobertura mayor o igual a 100X, 300X, 400X y 500X. Esta información, ademas se encuentra", 0, 1, 'L')
+    pdf.cell(90, 8,"por muestra en el reporte suplementario del pipeline TumorSec.", 0, 1, 'L')
+
 
     #pdf.cell(90, 8,"", 0, 1, 'L') 
     pdf.cell(-40)
@@ -509,7 +518,7 @@ def pdf_report(corrida,path_input,output_pdf,df_baseSpace,df_metric_lect,df_metr
     pdf.image(output_plots+'/400x.png', x = None, y = None, w = 100, h = 80, type = 'png', link = '')
     pdf.cell(120, 5,"Imagen 18: Porcentaje de bases targets que poseen una cobertura mayor o igual a 400X", 0, 2, 'L')
     pdf.image(output_plots+'/500x.png', x = None, y = None, w = 100, h = 80, type = 'png', link = '')
-    pdf.cell(120, 5,"Imagen 18: Porcentaje de bases targets que poseen una cobertura mayor o igual a 500X", 0, 2, 'L')
+    pdf.cell(120, 5,"Imagen 19: Porcentaje de bases targets que poseen una cobertura mayor o igual a 500X", 0, 2, 'L')
 
     pdf.output(output_pdf+'/Reporte_corrida'+corrida+'.pdf', 'F')
     print("Reporte PDF con las métricas de calidad de la corrida ---> LISTO !!")
@@ -558,9 +567,14 @@ def main():
     with open(data) as json_data:
         data = json.load(json_data)
         p=pd.DataFrame(data['report_general_stats_data'][2])# id': 'fastp_filtered_reads_plot'
+        print(p)
 
-    df_before = pd.DataFrame(p.iloc[11,])
-    df_after = pd.DataFrame(p.iloc[13,])
+    df_before = pd.DataFrame(p.iloc[15,])
+    print("ANTES")
+    print(df_before)
+    df_after = pd.DataFrame(p.iloc[6,])
+    print("DESPUES")
+    print(df_after)
     df_trimming_metrics=pd.merge(df_before, df_after, left_index=True, right_index=True)
     df_trimming_metrics.reset_index(drop=False, inplace=True)
     df_trimming_metrics.columns=['Sample','Reads_before_trimming','Reads_after_trimming']
@@ -570,7 +584,7 @@ def main():
         prom.append(100-(df_trimming_metrics['Reads_after_trimming'][i]*100/df_trimming_metrics['Reads_before_trimming'][i]))
     
     df_trimming_metrics.insert(3,'pct_trimmed_reads',prom,True)   
-    
+    print(df_trimming_metrics)
     count=df_trimming_metrics.shape[0]
     n=df_trimming_metrics.shape[0]
     color=cm.gist_earth(np.linspace(0,1,n))
@@ -593,13 +607,20 @@ def main():
 
     #### TRIMMING + DUPLICADOS
     df_merge1=df_trimming_metrics.merge(df_dedup_metrics, on='Sample')
+    print (df_merge1)
 
     ############ READS EN REGIONES ON-TARGETS
     list_ontarget = [['Sample','total_reads','on_target','pc_ontarget']]
 
     for sample in samples:
         data=path_input+"/TMP_dedup/"+sample+".ontarget.txt"
-        ontarget = pd.read_csv(data,delimiter='\t', skip_blank_lines=True,header=None)
+        try:
+        	ontarget = pd.read_csv(data,header=None, delim_whitespace=True)
+        	
+        except pd.io.common.EmptyDataError:
+        	df = pd.DataFrame()
+        	
+        print(ontarget)
         lis=[sample,ontarget[0][1],ontarget[0][0],float((ontarget[0][0]*100)/ontarget[0][1])]
         list_ontarget.append(lis)
 
@@ -672,14 +693,25 @@ def main():
     baseSpace = pd.read_csv(kit,delimiter=',', skip_blank_lines=True, header=None)
     df_baseSpace = pd.DataFrame(baseSpace)
     df_baseSpace[1][3]
-    data=path_input+"/0_data_input/Metricas_Lecturas.csv"
-    metric_lect = pd.read_csv(data,delimiter=',', skip_blank_lines=True)
-    df_metric_lect = pd.DataFrame(metric_lect)
-    data=path_input+"/0_data_input/metricas_linea.csv"
-    metric_linea = pd.read_csv(data,delimiter=',', skip_blank_lines=True)
-    df_metric_linea = pd.DataFrame(metric_linea)
     
-    data_400X=output_coverage+"/ALL_SAMPLES_400X.csv"
+    ##interop
+    data=output_coverage+"/interop_summary2.csv"
+    metric_linea = pd.read_csv(data,delimiter=',', skip_blank_lines=True)
+    interop2 = pd.DataFrame(metric_linea)
+    interop2 = interop2.drop([1,2,3,5,6,7,9,10],axis=0)
+    df_metric_linea = interop2.loc[0,['Density', 'ClusterPF']]
+
+	##interop 
+    data=output_coverage+"/interop_summary.csv"
+    lect = pd.read_csv(data,delimiter=',', skip_blank_lines=True)
+    interop1 = pd.DataFrame(lect)
+    interop2.index = [0, 1, 2]
+    
+    print (interop1)
+    print (interop2)
+    df_metric_lect = pd.concat([interop1, interop2], axis=1, sort=False)
+
+    data_400X=output_coverage+"/ALL_SAMPLES_300X.csv"
     n_400X = pd.read_csv(data_400X,delimiter=',', skip_blank_lines=True,header=None)
     df_400X = pd.DataFrame(n_400X)
     df_400X.columns = ['Sample','pct','70','80','90','100']
