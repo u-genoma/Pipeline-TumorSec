@@ -31,10 +31,6 @@ centos                         7                   8652b9f0cb4c        6 weeks a
 ```
 Ejecutamos las siguientes instrucciones para la descarga.
 ```
-#docker login docker.io
-Username: labgenomicatumorsec
-Password: UDT-seq#19
-
 docker pull labgenomicatumorsec/tumorsec:0.1
 ```
 Para verificar que se descargó la imagen:
