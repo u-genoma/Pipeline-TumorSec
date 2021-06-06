@@ -1,4 +1,10 @@
-# Pipeline-TumorSec
+# TumorSec
+
+**Validation of a NGS panel, with automated analysis, designed for detection of medically actionable tumor biomarkers for Latin America**
+
+https://www.medrxiv.org/content/10.1101/2021.03.19.21253988v1
+
+
 ## Manual de Procedimientos: Paquete Bioinformático TumorSec.
 
 A continuación se presenta el manual de usuario de pipeline bioinformático TumorSec. Desarrollado por el laboratorio de Genómica del Cáncer en colaboración con GENOMED, ambos de la facultad de medicina, Universidad de Chile.
