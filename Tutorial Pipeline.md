@@ -429,8 +429,8 @@ Las carpetas 4 y 7 contiene reportes en PDF con un resumen de los resultados por
 
 El archivo ```Dockerfile``` contiene los comandos necesarios para instalar todos los pre-requisitos del pipeline TumorSec, ademas de integrar las bases de datos y archivos específicos del pipeline. Utilizando la configuración del ```Dockerfile```que se encuentra en el directorio ```/home/egonzalez/workSpace/docker_PipelineTumorsec```, se construyó la imagen docker la cual fue almacenada en un repositorio privado en DockerHub.
 
-- Cuenta: tumorsec@gmail.com        
-- Contraseña:UDT-seq#19
+- Cuenta: XXXXX@gmail.com        
+- Contraseña: XXXXX
 
 El contexto para construir la imagen de docker para el pipeline TumorSec, se encuentra en la siguiente ruta
 ```/home/egonzalez/workSpace/docker_PipelineTumorsec```
