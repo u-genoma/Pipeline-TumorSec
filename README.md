@@ -83,14 +83,15 @@ What steps do you want to execute?
 5. Recalibration
 6. Varcall - Variants report
 7. Annotation
-Example, all pipeline -> 0-7, only varcall -> 6, from trimming to realignment -> 1-4
+8. Filter vcf (RGO Input)
+Example, all pipeline -> 0-8, only varcall -> 6, from trimming to realignment -> 1-4
 2-7
 
 Build sample dendogram (y / n)
-y
+n
 
 Threads:
-20
+10
 
 Enter input parameters (path) or by default (0):
 0
@@ -102,7 +103,7 @@ Enter input parameters (path) or by default (0):
 == Búsqueda de variantes somáticas de importancia oncológica ==
 Developed by the Laboratory of Genomics of Cancer and GENOMELAB, School of Medicine. University of Chile
 
-Command: sh /home/egonzalez/workSpace/PipelineTumorSec/01.Run_TumorSec.sh --input--dir /home/egonzalez/workSpace/runs_TumorSec/200109_TumorSec --threads 20 --baseSpace /home/egonzalez/BaseSpace/Runs/Tumorsec20200109 --dendogram y --step 2-7 --input--data /home/egonzalez/workSpace/PipelineTumorSec/00.inputs_TumorSec.ini
+Command: sh /home/egonzalez/workSpace/PipelineTumorSec/01.Run_TumorSec.sh --input--dir /home/egonzalez/workSpace/runs_TumorSec/200109_TumorSec --threads 10 --baseSpace /home/egonzalez/BaseSpace/Runs/Tumorsec20200109 --dendogram y --step 2-7 --input--data /home/egonzalez/workSpace/PipelineTumorSec/00.inputs_TumorSec.ini
 
 ```
 
@@ -114,14 +115,15 @@ Por cada proceso relevante en la ejecución del  pipeline de TumorSec, se crea u
 	├── 0_logs 
 	├── 1_fastq
 	├── 2_trim 
-	├── tmp_bwa 
-	├── 3_dedup 
+	├── TMP_bwa 
+	├── TMP_dedup 
 	├── 4_QC_reports
-	├── tmp_realign
-	├── 5_bqsr
-	├── 6_varcall
-	├── 7_annotate
-	├── 8_variants_report
+	├── TMP_realign
+	├── 3_bqsr
+	├── 5_varcall
+	├── 6_annotate
+	├── 7_variants_report
+	├── 8_RGO
 ```
 
 El detalle del contenido de cada directorio se describe en las secciones de pre-procesamiento de datos, llamado de variantes, anotación funcional,  control de calidad y reportes.
@@ -149,26 +151,26 @@ El segundo paso del pre-procesamiento de datos consiste en mapear cada par de le
 Finalmente se genera un archivo BAM/SAM ordenado para cada muestra que es almacenado en al carpeta de salida: 
 
 ```
-${WORKSPACE}/3_bwa
+${WORKSPACE}/TMP_bwa
 ```
 #### 3.1.4 Remover duplicados
 El tercer paso del pre-procesamiento se realiza por muestra y consiste en identificar pares de lectura que probablemente se hayan originado a partir de un mismo fragmento de ADN, por tanto son lecturas duplicadas. Estas se consideran observaciones no independientes, por lo que el programa etiqueta a todas las lecturas, menos un par de lecturas dentro de cada conjunto de duplicados, lo que hace que los pares marcados se ignoren por defecto durante el proceso de descubrimiento de variantes. En el pipeline TumorSec se utiliza la herramienta MarkDuplicates de Picard v2.20.2-8 de para este propósito, generando un nuevo directorio de salida con un archivo BAM por muestra que contiene las lecturas duplicadas marcadas, además de las métricas que serán integradas en un posterior reporte de calidad.
 
 ```
-${WORKSPACE}/4_dedup
+${WORKSPACE}/TMP_dedup
 ```
 #### 3.1.5 Realineamiento de InDels 
 El cuarto paso del pre-procesamiento de datos genómicos es el realineamiento de InDels, en donde, se alinean las lecturas localmente de modo que el número de bases que no coinciden en el alineamiento se minimiza en todas las lecturas. En general, un gran porcentaje de las regiones que requieren realineamiento local se deben a la presencia de una inserción o deleción. La realineación local sirve para transformar regiones desalineadas por los InDels en lecturas limpias que contienen un InDel consenso adecuado para el descubrimiento de variantes. En el pipeline TumorSec se utiliza la herramienta GATK v3.8-1-0 para este propósito, utilizando los parámetros por defectos recomendados por los desarrolladores. Se genera un directorio de salida con un archivo BAM por muestra con el alineamiento corregido en las inserciones y deleciones.
 
 ```
-${WORKSPACE}/6_realign
+${WORKSPACE}/TMP_realign
 ```
 #### 3.1.6 Recalibración de calidad de base (BQSR) 
 
 El último paso del pre-procesamiento de datos es la recalibracion del puntaje de calidad de base. Los puntajes de calidad de base, son las estimaciones de error emitidas por la máquina de secuenciación que expresa cuán segura estaba la máquina de identificar la base correcta. Debido a que los algoritmos de llamado de variante dependen del puntaje de calidad asignado a la base en cada posición de la lectura, es importante realizar una  recalibración de la calidad. Este procedimiento se realiza en el pipeline de TumorSec con programa GATK v3.8-1-0 utilizando los parámetros por defecto recomendados por los desarrolladores. GATK v3.8-1-0 detecta errores sistemáticos cometidos por la máquina de secuenciación cuando estima la calidad de cada base, y ajusta los puntajes de calidad en un proceso en el que aplica aprendizaje automático para modelar empíricamente estos errores. Finalmente el pipeline de TumorSec, genera un directorio de salida con los archivos BAM del alineamiento con la correccion del puntaje de base.
 
 ```
-${WORKSPACE}/7_bqsr
+${WORKSPACE}/3_bqsr
 ```
 
 ## 4. Llamado de variantes
@@ -183,11 +185,15 @@ Posterior al preprocesamiento de datos, el programa en bash ejecuta de manera pa
 El programa en bash de Tumorsec ejecuta de manera paralela los seis llamadores de variantes por muestras, en modo single (solo con muestras tumorales) utilizando un mínimo de frecuencia alélica para la búsqueda de variantes de un 1%. El resto de los parámetros establecidos son aquellos integrados por defecto por SomaticSeq v.3.3.0<sup>[4]</sup>. Cada llamador de variantes genera un archivo VCF, los cuales SomaticSeq v.3.3.0[ utilizará como parámetros de entrada para el cálculo de las variantes consenso. Se seleccionan aquellas SNVs o InDels que son reportadas por al menos 3 de los software de los 5 para SNV y 6 para InDels. Finalmente, el pipeline de TumorSec crea un nuevo directorio en la carpeta de trabajo, donde almacena los archivos VCF de cada llamador de variantes y el VCF final con las variantes consenso reportadas por SomaticSeq v.3.3.0.
 
 ```
-${WORKSPACE}/8_varcall
+${WORKSPACE}/5_varcall
 ```
 
 ## 5. Anotación
 Una vez obtenidas las variantes consenso por SomatiSeq[4], se realiza la anotación de variantes con importancia oncológica con CGI (Cancer Genome Interpreter)[10] , la cual, anota la relevancia biológica y clínica de las alteraciones tumorales.
+
+```
+${WORKSPACE}/6_annotate
+```
 
 ## 6. Filtro de variantes
 Finalmente el pipeline de Tumorsec realiza filtros que permiten eliminar los posibles artefactos y variantes germinales de la muestra. El primer filtro se realiza después del llamado de variantes con SomaticSeq[4], en la cual se seleccionan aquellas mutaciones identificadas por 3 o más llamadores de variantes (sección 4.0) con frecuencias alélicas superiores al 5% para cada muestra. El segundo filtro se realiza posterior a la anotación funcional con CGI (sección 5), donde se seleccionan aquellas variantes que no poseen frecuencia alélica reportadas en la base de datos ExAC o que son menores al 1%.
@@ -222,8 +228,8 @@ Integrando programas desarrollados en el laboratorio de Genómica del Cáncer, e
 Estos reportes son generados en nuevos directorios dentro de la carpeta de trabajo donde se está ejecutando el pipeline, las cuales corresponden a:
 
 ```
-${WORKSPACE}/5_QC_reports
-${WORKSPACE}/12_variants_report
+${WORKSPACE}/4_QC_reports
+${WORKSPACE}/7_variants_report
 ```
 
 ## 9. Referencias. 
