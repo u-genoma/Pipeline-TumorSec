@@ -182,8 +182,8 @@ You need to authenticate by opening this URL in a browser:
   
 ```
 Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos de la cuenta TumorSec o la cuenta personal de usuario.
-- Usuario:tumorsec@gmail.com
-- Contraseña: UDT-seq#19
+- Usuario:XXXX@gmail.com
+- Contraseña: XXXXXXX
 
 Ahora podemos observar las secuenciaciones que fueron compartidas a la cuenta tumorsec@gmail.com
 ```
