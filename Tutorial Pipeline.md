@@ -1,6 +1,6 @@
 ## Tutorial para la ejecución del Pipeline TumorSec
 
-A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.1```. Esta, se encuentra en un repositorio privado en el servidor DockerHub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto (información en sección 1.2).
+A continuación se describe de manera detallada los pasos necesarios para ejecutar el pipeline de TumorSec utilizando la imagen de docker ```labgenomicatumorsec/tumorsec:0.2```. Esta, se encuentra en un repositorio privado en el servidor DockerHub (https://hub.docker.com/).  Para la descarga, es necesario tener información de la cuenta de Docker Hub del proyecto (información en sección 1.2).
 
 Para ejecutar este pipeline se asume instalado el programa docker de manera local en host. Si no se encuentra instalado, ejecutar:```sudo yum -y install docker``` en sistema operativo Centos. Este tutorial fue testeado con ```docker v18.06.0-ce``` en el servidor Genoma3 del laboratorio Genomed, Facultad de medicina, Universidad de Chile.
 
@@ -10,7 +10,7 @@ Para ejecutar el paquete bioinformático TumorSec utilizando docker, es necesari
 
 #### 1.1. Configuración de usuario.
 
-Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.1``` , es necesario que el usuario tenga los permisos para correr docker. Para esto, el administrador(a) de sistema debe agregar al usuario al grupo docker del host.  En caso de no existir el grupo docker, debe ser creado. 
+Para poder ejecutar la imagen ```labgenomicatumorsec/tumorsec:0.2``` , es necesario que el usuario tenga los permisos para correr docker. Para esto, el administrador(a) de sistema debe agregar al usuario al grupo docker del host.  En caso de no existir el grupo docker, debe ser creado. 
 ```
 groupadd --system docker
 sudo usermod -aG docker $USER
@@ -21,7 +21,7 @@ sudo systemctl restart docker
 ```
 #### 1.2. Descargar imagen docker Tumorsec y externas necesarias
 
-La imagen ```labgenomicatumorsec/tumorsec:0.1``` debe estar disponible en la sistema para su ejecución. Esta, se encuentra en la nube en un repositorio privado de Docker Hub. Procedemos a descargar la imagen.
+La imagen ```labgenomicatumorsec/tumorsec:0.2``` debe estar disponible en la sistema para su ejecución. Esta, se encuentra en la nube en un repositorio privado de Docker Hub. Procedemos a descargar la imagen.
 
 Primero verificamos que la imagen TumorSec no se encuentra en el sistema con ```docker image ls```. Si se encuentra en la lista desplegada, podemos omitir este paso. Se observa que en este caso, solo tenemos disponible una imagen de centos.
 ```
@@ -31,13 +31,13 @@ centos                         7                   8652b9f0cb4c        6 weeks a
 ```
 Ejecutamos las siguientes instrucciones para la descarga.
 ```
-docker pull labgenomicatumorsec/tumorsec:0.1
+docker pull labgenomicatumorsec/tumorsec:0.2
 ```
 Para verificar que se descargó la imagen:
 ```
 #docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 6b630587ab31        8 minutes ago       9.13GB
+labgenomicatumorsec/tumorsec   0.2                 6b630587ab31        8 minutes ago       9.13GB
 centos                         7                   8652b9f0cb4c        6 weeks ago         204MB
 ```
 **Importante**: La primera vez que se ejecute el pipeline de TumorSec, se decargarán las imagenes de docker necesarias para ejecutar SomaticSeq en el llamado de variantes, para esto, es necesario tener aproximadamente 20GB de memoria disponible en docker. Ejecutar el comando ```docker system df``` para ver la cantidad de espacio de disco disponible. 
@@ -67,7 +67,7 @@ Revisamos las imagenes disponibles en el host.
 ```
 docker image ls
 REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
-labgenomicatumorsec/tumorsec   0.1                 11213c4c4ad2        39 hours ago        9.68GB
+labgenomicatumorsec/tumorsec   0.2                 11213c4c4ad2        39 hours ago        9.68GB
 centos                         7                   8652b9f0cb4c        8 weeks ago         204MB
 lethalfang/somaticseq          3.1.1               abd3208c2b66        23 months ago       1.33GB
 lethalfang/strelka             2.9.5               a47ee82d2a60        2 years ago         304MB
@@ -81,9 +81,9 @@ djordjeklisic/sbg-varscan2     v1                  0a3d079b6bc9        5 years a
 ```
 #### 1.3 Descargar bases de datos externas
 
-La imagen ```labgenomicatumorsec/tumorsec:0.1``` contiene un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/docker/TumorSec ``` de la imagen. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
+La imagen ```labgenomicatumorsec/tumorsec:0.2``` contiene un script en bash ```DB_download.sh``` que se encuentra dentro del directorio ```/docker/TumorSec ``` de la imagen. Este script permite descargar las bases de datos que no fueron intregadas en la imagen (por el tamaño) y que son necesarias para ejecutar el pipeline de TumorSec. 
 
-Para ejecutar este script se debe crear un contenedor de la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` de manera interactiva (parámetro -ti en docker run), montando el directorio de descarga del host en el contenedor (con parámetro --mount). Para esto, ejecutar el siguiente comando:
+Para ejecutar este script se debe crear un contenedor de la imagen docker ```labgenomicatumorsec/tumorsec:0.2``` de manera interactiva (parámetro -ti en docker run), montando el directorio de descarga del host en el contenedor (con parámetro --mount). Para esto, ejecutar el siguiente comando:
 ```
 docker run --privileged -ti --name CONTAINER_NAME --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
 ```
@@ -125,7 +125,7 @@ d237e9aacf86037fcf41d75de1df88cc  Mills_and_1000G_gold_standard.indels.hg19.site
 ``` 
 #### 1.4 Crear volumen para datos internos en la imagen
 
-Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.1``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la imagen.
+Existen archivos dentro de la imagen de docker ```labgenomicatumorsec/tumorsec:0.2``` que son propios del pipeline, por ejemplo el archivo .bed que contiene las regiones blanco del panel de genes, la base de datos cosmic, el logo del laboratorio, ademas de los script que conforman el pipeline TumorSec. Para que estos datos sean vizualizados por otros contenedores, es necesario crear un volumen que será utilizado para montar los datos de la imagen.
 
 Crear un volumen con el nombre ```datatumorsec```
 ```
@@ -245,7 +245,7 @@ Descripción de los parámetros:
 - ```-v $(which docker):/usr/bin/docker``` : Vincula el binario (docker) del host al nuevo contenedor.
 - ```--mount type=bind,source=/home,target=/mnt/home,bind-propagation=rslave```: Monta los datos del ```/home``` del host al nuevo contenedor en ```/mnt/home``` de manera recursiva, así la ejecución docker-in-docker puede vizualizar los datos. 
 - ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave```: Monta los datos del ```/path/to/output_DB``` del host al nuevo contenedor en ```/mnt/docker/DB_TumorSec``` de manera recursiva.
-- ```labgenomicatumorsec/tumorsec:0.1```: Imagen docker de TumorSec que fue descargada de Docker Hub. 
+- ```labgenomicatumorsec/tumorsec:0.2```: Imagen docker de TumorSec que fue descargada de Docker Hub. 
 - ```/bin/bash```: Contenedor ejecuta un bash, así permite ingresar en modo consola dentro del contenedor.
 
 El parámetro ```/path/to/output_DB``` en ```--mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave``` debe ser remplazado por la ruta absoluta en donde se encuentran las bases de datos externas que fueron previamente descargadas (Seccion 1.3). 
@@ -437,10 +437,10 @@ El contexto para construir la imagen de docker para el pipeline TumorSec, se enc
 
 ```
 cd /home/egonzalez/workSpace/docker_PipelineTumorsec
-docker build -t labgenomicatumorsec/tumorsec:0.1 .
+docker build -t labgenomicatumorsec/tumorsec:0.2 .
 ```
 
-Cada vez que se cree una nueva versión de la imagen docker ```labgenomicatumorsec/tumorsec:0.1``` se debe eliminar el volumen ```datatumorsec```(Sección 1.4) con el comando ```docker volume rm datatumorsec```y crearlo de nuevo ```docker volume create datatumorsec```. De esta manera se podrán ver los cambios realizados en la imagen al momento de crear un nuevo contenedor.
+Cada vez que se cree una nueva versión de la imagen docker ```labgenomicatumorsec/tumorsec:0.2``` se debe eliminar el volumen ```datatumorsec```(Sección 1.4) con el comando ```docker volume rm datatumorsec```y crearlo de nuevo ```docker volume create datatumorsec```. De esta manera se podrán ver los cambios realizados en la imagen al momento de crear un nuevo contenedor.
 
 Para subir imagen a Docker Hub. 
-```docker push labgenomicatumorsec/tumorsec:0.1```
+```docker push labgenomicatumorsec/tumorsec:0.2```
