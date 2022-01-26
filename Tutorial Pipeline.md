@@ -185,7 +185,7 @@ Copiar el URL que saldrá en la pantalla, en el navegador e ingresar los datos d
 - Usuario:XXXX@gmail.com
 - Contraseña: XXXXXXX
 
-Ahora podemos observar las secuenciaciones que fueron compartidas a la cuenta tumorsec@gmail.com
+Ahora podemos observar las secuenciaciones que fueron compartidas a la cuenta XXXX@gmail.com
 ```
 # cd BaseSpace/
 # ls
