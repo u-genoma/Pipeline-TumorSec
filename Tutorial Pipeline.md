@@ -85,7 +85,7 @@ La imagen ```labgenomicatumorsec/tumorsec:0.2``` contiene un script en bash ```D
 
 Para ejecutar este script se debe crear un contenedor de la imagen docker ```labgenomicatumorsec/tumorsec:0.2``` de manera interactiva (parámetro -ti en docker run), montando el directorio de descarga del host en el contenedor (con parámetro --mount). Para esto, ejecutar el siguiente comando:
 ```
-docker run --privileged -ti --name CONTAINER_NAME --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.1 /bin/bash
+docker run --privileged -ti --name CONTAINER_NAME --mount type=bind,source=/path/to/output_DB,target=/mnt/docker/DB_TumorSec,bind-propagation=rslave labgenomicatumorsec/tumorsec:0.2 /bin/bash
 ```
 Donde ```/path/to/output_DB``` y ```CONTAINER_NAME``` son los único parámetro que se deben modificar, corresponden al directorio donde se descargarán las bases de datos en el host y el nombre del contenedor dado por el usuario (ejemplo DOWNLOAD_DB). Dentro del contenedor, este directorio será ```/mnt/docker/DB_TumorSec```(no modificar), el cual, debe ser el parámetro de entrada para el script ``` DB_download.sh```. Dato: si ya existe un contenedor con el mismo nombre, se debe cambiar el nombre del contenedor y/o eliminar el contenedor antiguo con el mismo nombre.
 
