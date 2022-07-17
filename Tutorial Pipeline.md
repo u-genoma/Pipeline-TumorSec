@@ -444,3 +444,16 @@ Cada vez que se cree una nueva versión de la imagen docker ```labgenomicatumors
 
 Para subir imagen a Docker Hub. 
 ```docker push labgenomicatumorsec/tumorsec:0.3```
+
+### 5. Contrucción de imagen docker a partir de contenedor modificado
+
+
+```
+docker login
+docker commit d8ebee686aa3 (CONTAINER ID)
+docker images -a
+docker tag 52b4a7543f03 (NEW IMAGEN ID) labgenomicatumorsec/tumorsec:0.3
+docker push labgenomicatumorsec/tumorsec:0.3
+```
+
+
